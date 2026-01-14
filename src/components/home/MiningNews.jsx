@@ -31,7 +31,7 @@ const MiningNews = () => {
   ];
 
   return (
-    <section className="bg-white py-20 px-6 md:px-16">
+    <section className="bg-white container-x py-20 px-6 md:px-16">
       {/* HEADER */}
       <div className="text-center mb-16">
         <h2 className="text-3xl md:text-4xl josefin-sans font-extrabold text-black uppercase tracking-wide">

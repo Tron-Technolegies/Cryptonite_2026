@@ -7,6 +7,7 @@ import WhyChooseUs from "../components/home/WhyChooseUs";
 import MiningNews from "../components/home/MiningNews";
 import Blogs from "./Blogs";
 import FAQ from "../components/home/FAQ";
+import TimelineSection from "../components/home/TimelineSection";
 
 export default function Homepage() {
   return (
@@ -18,6 +19,7 @@ export default function Homepage() {
       <WhyChooseUs />
       <MiningNews />
       <Blogs />
+      <TimelineSection limit={2} />
       <FAQ />
     </div>
   );
