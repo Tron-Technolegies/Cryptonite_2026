@@ -9,6 +9,8 @@ import Errorpage from "./pages/ErrorPage";
 import LocationDetails from "./pages/LocationDetails";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import CoinCalculator from "./pages/CoinCalculator";
+import AllProducts from "./pages/AllProducts";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +42,8 @@ const router = createBrowserRouter([
         path: "/contact",
         element: <ContactPage />,
       },
+      { path: "/calculator/:coin", element: <CoinCalculator /> },
+      { path: "/shop", element: <AllProducts /> },
     ],
   },
 ]);

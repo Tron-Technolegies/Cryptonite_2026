@@ -1,5 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import {
   FiSearch,
   FiShoppingCart,
@@ -8,21 +8,20 @@ import {
   FiChevronUp,
   FiMenu,
   FiX,
-  FiChevronsDown,
 } from "react-icons/fi";
+import { MdKeyboardArrowDown } from "react-icons/md";
 
 import logo from "/logos/cryptonitelogoupdated.png";
 import { blogPosts } from "../../utils/blogs";
 import miningLocations from "../../utils/miningLocations";
-import { MdKeyboardArrowDown } from "react-icons/md";
+import { COINS } from "../../config/coins.config";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-
-  const location = useLocation();
+  const [mobileDropdown, setMobileDropdown] = useState(null);
 
   /* ================= AUTH ================= */
   useEffect(() => {
@@ -85,9 +84,18 @@ const Header = () => {
               ))}
             </Dropdown>
 
-            <Link to="/calculator" className="hover:text-green-500">
-              Calculator
-            </Link>
+            <Dropdown
+              title="Calculator"
+              open={openDropdown === "calculator"}
+              setOpen={() => setOpenDropdown("calculator")}
+              close={() => setOpenDropdown(null)}
+            >
+              {Object.values(COINS).map((coin) => (
+                <DropdownItem key={coin.symbol} to={`/calculator/${coin.symbol}`}>
+                  {coin.name} Mining Calculator
+                </DropdownItem>
+              ))}
+            </Dropdown>
 
             <Dropdown
               title="How it Works"
@@ -172,10 +180,24 @@ const Header = () => {
             ASIC Miners
           </Link>
 
+          {/* CALCULATOR (MOBILE DROPDOWN) */}
+          <MobileDropdown
+            title="Calculator"
+            open={mobileDropdown === "calculator"}
+            toggle={() => setMobileDropdown(mobileDropdown === "calculator" ? null : "calculator")}
+          >
+            {Object.values(COINS).map((coin) => (
+              <MobileItem key={coin.symbol} to={`/calculator/${coin.symbol}`} close={setMobileOpen}>
+                {coin.name} Calculator
+              </MobileItem>
+            ))}
+          </MobileDropdown>
+
+          {/* HOSTING */}
           <MobileDropdown
             title="Hosting"
-            open={openDropdown === "hosting-m"}
-            toggle={() => setOpenDropdown(openDropdown === "hosting-m" ? null : "hosting-m")}
+            open={mobileDropdown === "hosting"}
+            toggle={() => setMobileDropdown(mobileDropdown === "hosting" ? null : "hosting")}
           >
             {miningLocations.map((loc) => (
               <MobileItem key={loc.id} to={`/locations/${loc.id}`} close={setMobileOpen}>
@@ -184,31 +206,11 @@ const Header = () => {
             ))}
           </MobileDropdown>
 
-          <Link to="/calculator" onClick={() => setMobileOpen(false)}>
-            Calculator
-          </Link>
-
-          {/* HOW IT WORKS */}
-          <MobileDropdown
-            title="How it Works"
-            open={openDropdown === "how-m"}
-            toggle={() => setOpenDropdown(openDropdown === "how-m" ? null : "how-m")}
-          >
-            {blogPosts.map((blog) => (
-              <MobileItem key={blog.id} to={`/blogs/${blog.id}`} close={setMobileOpen}>
-                {blog.title}
-              </MobileItem>
-            ))}
-            <MobileItem to="/#faq" close={setMobileOpen}>
-              FAQ
-            </MobileItem>
-          </MobileDropdown>
-
           {/* COMPANY */}
           <MobileDropdown
             title="Company"
-            open={openDropdown === "company-m"}
-            toggle={() => setOpenDropdown(openDropdown === "company-m" ? null : "company-m")}
+            open={mobileDropdown === "company"}
+            toggle={() => setMobileDropdown(mobileDropdown === "company" ? null : "company")}
           >
             <MobileItem to="/about" close={setMobileOpen}>
               About Us
@@ -246,26 +248,37 @@ export default Header;
 /* ================= SUB COMPONENTS ================= */
 
 const Dropdown = ({ title, open, setOpen, close, children }) => {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        close();
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [close]);
+
   return (
-    <div className="relative" onMouseEnter={setOpen} onMouseLeave={close}>
-      {/* BUTTON */}
+    <div className="relative" ref={ref}>
       <button
-        onClick={open ? close : setOpen}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          open ? close() : setOpen();
+        }}
         className="flex items-center gap-1 hover:text-green-500"
       >
         {title}
-        <MdKeyboardArrowDown className="text-sm" />
+        <MdKeyboardArrowDown className={`transition ${open ? "rotate-180" : ""}`} />
       </button>
 
-      {/* DROPDOWN */}
       {open && (
         <div
-          className="
-            absolute left-0 top-full mt-2
-            w-72 bg-white text-black
-            rounded-lg shadow-lg
-            z-50
-          "
+          className="absolute left-0 top-full mt-2 w-72 bg-white text-black rounded-lg shadow-lg z-50"
+          onClick={(e) => e.stopPropagation()}
         >
           {children}
         </div>
@@ -282,7 +295,7 @@ const DropdownItem = ({ to, children }) => (
 
 const MobileDropdown = ({ title, open, toggle, children }) => (
   <div>
-    <button onClick={toggle} className="w-full flex justify-between">
+    <button onClick={toggle} className="w-full flex justify-between items-center">
       {title}
       {open ? <FiChevronUp /> : <FiChevronDown />}
     </button>
