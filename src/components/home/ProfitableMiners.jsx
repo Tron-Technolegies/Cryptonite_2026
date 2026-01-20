@@ -14,7 +14,7 @@ export default function ProfitableMiners() {
       discount: null,
       daily_profit: "0.00",
       category: "home",
-      image: "https://res.cloudinary.com/demo/image/upload/v1699999999/miner1.png",
+      image: "/products/p1.png",
     },
     {
       id: 2,
@@ -24,7 +24,7 @@ export default function ProfitableMiners() {
       discount: null,
       daily_profit: "33.31",
       category: "air",
-      image: "https://res.cloudinary.com/demo/image/upload/v1699999999/miner2.png",
+      image: "/products/p3.png",
     },
     {
       id: 3,
@@ -34,7 +34,7 @@ export default function ProfitableMiners() {
       discount: 18,
       daily_profit: "44.71",
       category: "hydro",
-      image: "https://res.cloudinary.com/demo/image/upload/v1699999999/miner3.png",
+      image: "/products/p1.png",
     },
     {
       id: 4,
@@ -44,7 +44,7 @@ export default function ProfitableMiners() {
       discount: 39,
       daily_profit: "33.16",
       category: "hydro",
-      image: "https://res.cloudinary.com/demo/image/upload/v1699999999/miner4.png",
+      image: "/products/p2.png",
     },
   ];
 

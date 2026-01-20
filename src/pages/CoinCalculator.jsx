@@ -6,8 +6,12 @@ import CalculatorExplanation from "../components/calculator/CalculatorExplanatio
 import DailyProfitGraph from "../components/calculator/DailyProfitGraph";
 import CoinPriceGraph from "../components/calculator/CoinPriceGraph";
 import ProductGrid from "../components/products/ProductGrid";
+import { useEffect } from "react";
 
 export default function CoinCalculator() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const { coin } = useParams();
   const coinData = COINS[coin];
 
