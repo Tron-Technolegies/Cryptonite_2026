@@ -4,9 +4,9 @@ const miningProducts = [
     name: "Antminer S19 Pro",
     brand: "Bitmain",
     coin: "BTC",
-    hashrate: 110, // TH/s (number)
+    hashrate: 120, // TH/s (number)
     hashrateUnit: "TH/s",
-    power: 3250, // W
+    power: 2760, // W
     algorithm: "SHA-256",
     price: 3200,
     image: "/products/p1.png",

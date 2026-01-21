@@ -1,21 +1,101 @@
-const OptionCard = ({ title, price, items, button }) => {
-  return (
-    <div className="border border-gray-300 rounded-xl p-6">
-      <h3 className="text-lg font-semibold mb-3">{title}</h3>
+import { useState } from "react";
+import miningLocations from "../../utils/miningLocations";
 
-      <ul className="text-sm text-gray-600 space-y-2 mb-6">
+export default function OptionCard({
+  title,
+  price,
+  items,
+  available = true,
+  onSelect,
+  isSelected,
+  showLocationDropdown = false,
+}) {
+  const [selectedLocation, setSelectedLocation] = useState(miningLocations[0]);
+
+  const handleClick = () => {
+    if (available && onSelect) {
+      onSelect(title);
+    }
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      className={`border-2 rounded-xl p-6 transition-all cursor-pointer ${
+        isSelected
+          ? "border-green-600 bg-green-50"
+          : available
+            ? "border-gray-200 hover:border-green-400 hover:shadow-md"
+            : "border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
+      }`}
+      style={isSelected ? { borderColor: "var(--primary-color)", backgroundColor: "#f0fdf4" } : {}}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold">{title}</h3>
+        {available ? (
+          <span
+            className="text-xs px-3 py-1 rounded-full bg-green-100"
+            style={{ color: "var(--primary-color)" }}
+          >
+            Available
+          </span>
+        ) : (
+          <span className="text-xs px-3 py-1 rounded-full bg-gray-200 text-gray-600">
+            from €0.056/kWh
+          </span>
+        )}
+      </div>
+
+      {/* Price and Location Dropdown in Flex */}
+      <div className="mb-4">
+        <p className="text-2xl font-bold mb-2" style={{ color: "var(--primary-color)" }}>
+          {price}
+        </p>
+
+        {showLocationDropdown && (
+          <div className="mt-2">
+            <select
+              value={selectedLocation.id}
+              onChange={(e) => {
+                e.stopPropagation();
+                setSelectedLocation(miningLocations.find((loc) => loc.id === e.target.value));
+              }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full p-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2"
+              style={{ focusRingColor: "var(--primary-color)" }}
+            >
+              {miningLocations.map((location) => (
+                <option key={location.id} value={location.id}>
+                  {location.name} - {location.price}/kWh
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+
+      <ul className="space-y-2 mb-6">
         {items.map((item, i) => (
-          <li key={i}>• {item}</li>
+          <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+            <span className="text-green-600 mt-0.5">•</span>
+            {item}
+          </li>
         ))}
       </ul>
 
-      <p className="text-green-600 text-xl font-bold mb-4">{price}</p>
-
-      <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg">
-        {button}
+      <button
+        className={`w-full py-3 rounded-lg font-medium transition-all ${
+          isSelected
+            ? "bg-green-600 text-white"
+            : available
+              ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              : "bg-gray-200 text-gray-500 cursor-not-allowed"
+        }`}
+        style={isSelected ? { backgroundColor: "var(--primary-color)" } : {}}
+        disabled={!available}
+      >
+        {isSelected ? " Selected" : available ? "Select Option" : "Order Now"}
       </button>
     </div>
   );
-};
-
-export default OptionCard;
+}
