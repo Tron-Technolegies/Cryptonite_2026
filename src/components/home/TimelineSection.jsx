@@ -20,7 +20,7 @@ const TimelineSection = ({ limit }) => {
 
         <div className="relative">
           {/* Vertical line */}
-          <div className="hidden md:block absolute left-1/2 top-0 h-full w-[2px] bg-gray-200 -translate-x-1/2" />
+          <div className="absolute left-6 md:left-1/2 top-0 h-full w-[2px] bg-gray-200 -translate-x-1/2" />
 
           <div className="space-y-24">
             {data.map((blog, index) => {
@@ -54,7 +54,7 @@ const TimelineSection = ({ limit }) => {
                   </div>
 
                   {/* DOT */}
-                  <div className="relative z-10 hidden md:flex justify-center">
+                  <div className="absolute left-6 top-1/2 -translate-y-1/2 md:static md:top-auto md:translate-y-0 z-10 flex justify-center -translate-x-1/2 md:translate-x-0">
                     <span className="block w-4 h-4 bg-green-500 rounded-full border-4 border-white shadow" />
                   </div>
 

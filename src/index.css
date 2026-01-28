@@ -29,3 +29,7 @@
   padding-right: 1rem;
   font-family: "DM Sans", sans-serif;
 }
+
+.Toastify__toast-container {
+  z-index: 999999 !important;
+}

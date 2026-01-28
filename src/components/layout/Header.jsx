@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import {
   FiSearch,
@@ -8,6 +8,7 @@ import {
   FiChevronUp,
   FiMenu,
   FiX,
+  FiLogOut,
 } from "react-icons/fi";
 import { MdKeyboardArrowDown } from "react-icons/md";
 
@@ -17,6 +18,7 @@ import miningLocations from "../../utils/miningLocations";
 import { COINS } from "../../config/coins.config";
 
 const Header = () => {
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -50,6 +52,13 @@ const Header = () => {
     return () => window.removeEventListener("storage", updateCart);
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    window.dispatchEvent(new Event("auth-change"));
+    navigate("/login");
+  };
+
   return (
     <>
       {/* ================= HEADER ================= */}
@@ -68,7 +77,7 @@ const Header = () => {
               setOpen={() => setOpenDropdown("asic")}
               close={() => setOpenDropdown(null)}
             >
-              <DropdownItem to="/shop">All Products</DropdownItem>
+              <DropdownItem to="/shop" onClick={() => setOpenDropdown(null)}>All Products</DropdownItem>
             </Dropdown>
 
             <Dropdown
@@ -77,8 +86,10 @@ const Header = () => {
               setOpen={() => setOpenDropdown("hosting")}
               close={() => setOpenDropdown(null)}
             >
+              <DropdownItem to="/hosting" onClick={() => setOpenDropdown(null)}>All Hosting</DropdownItem>
+              <div className="border-t my-1" />
               {miningLocations.map((loc) => (
-                <DropdownItem key={loc.id} to={`/locations/${loc.id}`}>
+                <DropdownItem key={loc.id} to={`/locations/${loc.id}`} onClick={() => setOpenDropdown(null)}>
                   {loc.name}
                 </DropdownItem>
               ))}
@@ -90,8 +101,10 @@ const Header = () => {
               setOpen={() => setOpenDropdown("calculator")}
               close={() => setOpenDropdown(null)}
             >
+              <DropdownItem to="/calculator" onClick={() => setOpenDropdown(null)}>Common Calculator</DropdownItem>
+              <div className="border-t my-1" />
               {Object.values(COINS).map((coin) => (
-                <DropdownItem key={coin.symbol} to={`/calculator/${coin.symbol}`}>
+                <DropdownItem key={coin.symbol} to={`/calculator/${coin.symbol}`} onClick={() => setOpenDropdown(null)}>
                   {coin.name} Mining Calculator
                 </DropdownItem>
               ))}
@@ -104,12 +117,12 @@ const Header = () => {
               close={() => setOpenDropdown(null)}
             >
               {blogPosts.map((blog) => (
-                <DropdownItem key={blog.id} to={`/blogs/${blog.id}`}>
+                <DropdownItem key={blog.id} to={`/blogs/${blog.id}`} onClick={() => setOpenDropdown(null)}>
                   {blog.title}
                 </DropdownItem>
               ))}
               <div className="border-t my-1" />
-              <DropdownItem to="/#faq">FAQ</DropdownItem>
+              <DropdownItem to="/#faq" onClick={() => setOpenDropdown(null)}>FAQ</DropdownItem>
             </Dropdown>
 
             <Dropdown
@@ -118,9 +131,9 @@ const Header = () => {
               setOpen={() => setOpenDropdown("company")}
               close={() => setOpenDropdown(null)}
             >
-              <DropdownItem to="/about">About Us</DropdownItem>
-              <DropdownItem to="/contact">Contact</DropdownItem>
-              <DropdownItem to="/terms">Terms & Conditions</DropdownItem>
+              <DropdownItem to="/about" onClick={() => setOpenDropdown(null)}>About Us</DropdownItem>
+              <DropdownItem to="/contact" onClick={() => setOpenDropdown(null)}>Contact</DropdownItem>
+              <DropdownItem to="/terms" onClick={() => setOpenDropdown(null)}>Terms & Conditions</DropdownItem>
             </Dropdown>
           </nav>
 
@@ -138,9 +151,18 @@ const Header = () => {
             </Link>
 
             {isLoggedIn ? (
-              <Link to="/dashboard" className="text-2xl hover:text-green-500">
-                <FiUser />
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link to="/profile" className="text-2xl hover:text-green-500" title="My Profile">
+                  <FiUser />
+                </Link>
+                <button 
+                  onClick={handleLogout}
+                  className="text-xl hover:text-red-500" 
+                  title="Logout"
+                >
+                  <FiLogOut />
+                </button>
+              </div>
             ) : (
               <Link
                 to="/login"
@@ -186,6 +208,9 @@ const Header = () => {
             open={mobileDropdown === "calculator"}
             toggle={() => setMobileDropdown(mobileDropdown === "calculator" ? null : "calculator")}
           >
+            <MobileItem to="/calculator" close={setMobileOpen}>
+              Common Calculator
+            </MobileItem>
             {Object.values(COINS).map((coin) => (
               <MobileItem key={coin.symbol} to={`/calculator/${coin.symbol}`} close={setMobileOpen}>
                 {coin.name} Calculator
@@ -199,6 +224,9 @@ const Header = () => {
             open={mobileDropdown === "hosting"}
             toggle={() => setMobileDropdown(mobileDropdown === "hosting" ? null : "hosting")}
           >
+            <MobileItem to="/hosting" close={setMobileOpen}>
+              All Hosting
+            </MobileItem>
             {miningLocations.map((loc) => (
               <MobileItem key={loc.id} to={`/locations/${loc.id}`} close={setMobileOpen}>
                 {loc.name}
@@ -225,9 +253,20 @@ const Header = () => {
 
           {/* AUTH */}
           {isLoggedIn ? (
-            <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
-              My Profile
-            </Link>
+            <>
+              <Link to="/profile" onClick={() => setMobileOpen(false)}>
+                My Profile
+              </Link>
+              <button 
+                onClick={() => {
+                  handleLogout();
+                  setMobileOpen(false);
+                }}
+                className="text-left text-red-500"
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <Link
               to="/login"
@@ -287,8 +326,8 @@ const Dropdown = ({ title, open, setOpen, close, children }) => {
   );
 };
 
-const DropdownItem = ({ to, children }) => (
-  <Link to={to} className="block px-4 py-2 text-sm hover:bg-green-500/10 hover:text-green-500">
+const DropdownItem = ({ to, children, onClick }) => (
+  <Link to={to} onClick={onClick} className="block px-4 py-2 text-sm hover:bg-green-500/10 hover:text-green-500">
     {children}
   </Link>
 );

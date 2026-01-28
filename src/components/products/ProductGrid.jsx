@@ -1,15 +1,33 @@
 import { useEffect, useState } from "react";
 import productsData from "../../utils/products";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { addToCart } from "../../api/cart.api";
+import { toast } from "react-toastify";
 
 export default function ProductGrid({ coin }) {
   const [products, setProducts] = useState([]);
+  const [isAdding, setIsAdding] = useState(null); // ID of product being added
+  const navigate = useNavigate();
 
   useEffect(() => {
     const filtered = coin ? productsData.filter((p) => p.coin === coin) : productsData;
 
     setProducts(filtered);
   }, [coin]);
+
+  const handleBuyNow = async (p) => {
+    if (isAdding) return;
+    setIsAdding(p.id);
+    try {
+      await addToCart(p.id, null, 1);
+      navigate("/checkout");
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.error || "Failed to add to cart. Are you logged in?");
+    } finally {
+      setIsAdding(null);
+    }
+  };
 
   if (!products.length) {
     return <p className="text-gray-500 mt-6">No miners available for {coin}</p>;
@@ -35,14 +53,23 @@ export default function ProductGrid({ coin }) {
 
             <p className="text-sm text-gray-500">Algorithm: {p.algorithm}</p>
 
-            <p className="font-bold text-lg mt-3">{p.price.toLocaleString()}</p>
+            <p className="font-bold text-lg mt-3">${p.price.toLocaleString()}</p>
 
-            <Link
-              to={`/products/${p.id}`}
-              className="mt-4 block text-center bg-black text-white py-2 rounded-xl hover:bg-green-600 transition"
-            >
-              View Miner
-            </Link>
+            <div className="grid grid-cols-2 gap-2 mt-4">
+                <Link
+                to={`/products/${p.id}`}
+                className="block text-center bg-gray-100 text-black py-2 rounded-xl hover:bg-gray-200 transition text-sm font-medium"
+                >
+                View
+                </Link>
+                <button
+                onClick={() => handleBuyNow(p)}
+                disabled={isAdding === p.id}
+                className="block text-center bg-green-600 text-white py-2 rounded-xl hover:bg-green-700 transition text-sm font-medium disabled:opacity-50"
+                >
+                {isAdding === p.id ? '...' : 'Buy Now'}
+                </button>
+            </div>
           </div>
         ))}
       </div>

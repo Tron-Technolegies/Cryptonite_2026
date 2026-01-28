@@ -1,5 +1,6 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import products from "../utils/products";
 import { getCoinData } from "../api/price.api";
 import Spec from "../components/products/Spec";
@@ -17,8 +18,11 @@ import { FaCoins } from "react-icons/fa";
 import { LiaTachometerAltSolid } from "react-icons/lia";
 import { PiSpeedometerBold } from "react-icons/pi";
 import miningLocations from "../utils/miningLocations";
+import { addToCart } from "../api/cart.api";
 
 export default function SingleProduct() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -29,6 +33,7 @@ export default function SingleProduct() {
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedOption, setSelectedOption] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
     // Fetch only the coin that this machine mines
@@ -46,22 +51,57 @@ export default function SingleProduct() {
     }
   }, [product]);
 
-  const handleAddToCart = () => {
-    // Only add Buy/Shipment option to cart
-    console.log("Adding to cart:", {
-      product: product.name,
-      option: "Buy",
-      price: product.price,
-      quantity: quantity,
-    });
-    alert(`Added ${quantity} x ${product.name} to cart! (Buy option)`);
-    // TODO: Implement cart functionality
+  const handleBuyNow = async () => {
+    if (isAdding) return;
+    setIsAdding(true);
+    try {
+      // Add to Backend Cart
+      await addToCart(product.id, null, quantity);
+      
+      // Navigate to Checkout (Source of truth is now backend cart)
+      navigate("/checkout");
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.error || "Failed to add to cart. Are you logged in?");
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   const handleOptionSelect = (option) => {
     setSelectedOption(option);
-    console.log("Selected option:", option);
-    // TODO: Navigate to checkout with selected option
+  };
+  
+  const handleProceedWithOption = async () => {
+    if (!selectedOption) {
+      toast.error("Please select a deployment option");
+      return;
+    }
+    
+    if (selectedOption === 'Shipment') {
+        // Shipment is effectively "Buy Now"
+        handleBuyNow();
+        return;
+    }
+
+    if (isAdding) return;
+    setIsAdding(true);
+    try {
+      // Add to Backend Cart
+      await addToCart(product.id, null, quantity);
+      
+      // Navigate to Checkout
+      navigate("/checkout", { 
+        state: { 
+          purchaseType: selectedOption.toLowerCase() 
+        } 
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.error || "Failed to add to cart. Are you logged in?");
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   if (!product) return <p className="text-center py-20">Product not found</p>;
@@ -157,8 +197,9 @@ export default function SingleProduct() {
                 min="1"
               />
               <button
-                onClick={() => setQuantity(quantity + 1)}
+                onClick={() => setQuantity(Math.min(10, quantity + 1))}
                 className="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-lg font-bold text-lg transition-colors"
+                disabled={quantity >= 10}
               >
                 +
               </button>
@@ -167,13 +208,14 @@ export default function SingleProduct() {
 
           {/* CTA - Only Buy Option */}
           <button
-            onClick={handleAddToCart}
-            className="w-full text-white py-3 rounded-lg font-medium transition-all hover:shadow-lg"
+            onClick={handleBuyNow}
+            disabled={isAdding}
+            className="w-full text-white py-3 rounded-lg font-medium transition-all hover:shadow-lg disabled:opacity-50"
             style={{ backgroundColor: "var(--primary-color)" }}
             onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
             onMouseLeave={(e) => (e.target.style.opacity = "1")}
           >
-            Add to Cart (Buy)
+            {isAdding ? 'Processing...' : 'Buy Now'}
           </button>
           <div className="grid grid-cols-3 gap-6 mt-8 text-center text-xs text-gray-600">
             <Trust icon={<FiShield />} title="12 Months" text="Warranty" />
@@ -225,7 +267,7 @@ export default function SingleProduct() {
             <button
               className="px-8 py-3 rounded-lg font-medium text-white transition-all hover:shadow-lg"
               style={{ backgroundColor: "var(--primary-color)" }}
-              onClick={() => alert(`Proceeding to checkout with ${selectedOption} option`)}
+              onClick={handleProceedWithOption}
             >
               Proceed to Checkout ({selectedOption})
             </button>
