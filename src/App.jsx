@@ -66,7 +66,7 @@ const router = createBrowserRouter([
       { path: "login", element: <LoginPage /> },
       { path: "signup", element: <SignupPage /> },
       { path: "forgot-password", element: <ForgotPasswordPage /> },
-      { path: "auth/verify-email/:uidb64/:token", element: <VerifyEmailPage /> },
+      { path: "/verify-email/:uidb64/:token", element: <VerifyEmailPage /> },
       { path: "auth/reset-password/:uidb64/:token", element: <ResetPasswordPage /> },
       { path: "bundles", element: <BundleProducts /> },
       { path: "bundles/:id", element: <SingleBundle /> },
