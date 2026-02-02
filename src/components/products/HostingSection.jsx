@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaCheckCircle, FaBolt, FaShieldAlt, FaExchangeAlt, FaCoins } from "react-icons/fa";
 import HostingForm from "./HostingForm";
 import miningLocations from "../../utils/miningLocations";
+import { sendEnquiryMessage } from "../../utils/whatsApp";
 
 const hostingBenefits = [
   {
@@ -183,22 +184,19 @@ export default function HostingSection() {
         </div>
 
         {/* CTA */}
-        <div className="mt-6 text-center">
+        {/* <div className="mt-6 text-center">
           <button
-            onClick={() => setShowForm(true)}
+            onClick={() => sendEnquiryMessage()}
             className="px-8 py-3 rounded-lg font-medium text-white transition-all hover:shadow-lg"
             style={{ backgroundColor: "var(--primary-color)" }}
             onMouseEnter={(e) => (e.target.style.transform = "scale(1.05)")}
             onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
           >
-            Request Hosting Information
+            Contact via WhatsApp for Hosting
           </button>
-        </div>
+        </div> */}
       </div>
-
-      {showForm && (
-        <HostingForm onClose={() => setShowForm(false)} selectedLocation={selectedLocation} />
-      )}
     </>
   );
 }
+    

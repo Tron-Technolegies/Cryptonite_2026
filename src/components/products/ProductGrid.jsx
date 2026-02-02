@@ -1,9 +1,9 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getProducts } from "../../api/product.api";
 import { addToCart } from "../../api/cart.api";
 import { getImageUrl } from "../../utils/imageUtils";
+import { getProducts } from "../../api/product.api";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -12,10 +12,42 @@ const SORT_MAP = {
   best: "-average_rating",
   priceLow: "price",
   priceHigh: "-price",
-  hashrate: "-hashrate",
 };
 
-export default function ProductGrid({ filters, sortBy, onCountChange }) {
+/* Build backend-compatible query */
+const buildQuery = (filters, sortBy) => {
+  const params = new URLSearchParams();
+
+  // price range
+  params.append("min_price", filters.price[0]);
+  params.append("max_price", filters.price[1]);
+
+  // brand (backend supports this)
+  filters.brand.forEach((b) => {
+    params.append("brand", b);
+  });
+
+  //  FRONTEND coin → BACKEND minable_coins
+  filters.coin.forEach((c) => {
+    params.append("minable_coins", c);
+  });
+
+  //  FRONTEND inStock → BACKEND is_available
+  if (filters.inStock) {
+    params.append("is_available", "true");
+  }
+
+  // sorting (backend supports this)
+  params.append("ordering", SORT_MAP[sortBy] || "-id");
+
+  return params.toString();
+};
+
+export default function ProductGrid({
+  filters = { coin: [], brand: [], price: [0, 10000], inStock: false },
+  sortBy = "best",
+  onCountChange,
+}) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -27,25 +59,19 @@ export default function ProductGrid({ filters, sortBy, onCountChange }) {
   useEffect(() => {
     setLoading(true);
 
-    const params = {
-      ordering: SORT_MAP[sortBy] || "-id",
-    };
+    const query = buildQuery(filters, sortBy);
+    console.log("QUERY:", query); // ✅ safe here
 
-    if (filters.coin.length) params.coin = filters.coin;
-    if (filters.brand.length) params.brand = filters.brand;
-    if (filters.inStock) params.in_stock = true;
-
-    params.price_min = filters.price[0];
-    params.price_max = filters.price[1];
-
-    getProducts(params)
-      .then((data) => {
+    getProducts(query)
+      .then((res) => {
+        const data = res.data;
         const items = data.results || data;
+
         setProducts(items);
         onCountChange?.(items.length);
       })
-      .catch(() => {
-        toast.error("Failed to load products");
+      .catch((err) => {
+        console.error("PRODUCT FETCH ERROR:", err);
         setProducts([]);
       })
       .finally(() => setLoading(false));
@@ -101,34 +127,31 @@ export default function ProductGrid({ filters, sortBy, onCountChange }) {
             key={p.id}
             className="bg-white border border-gray-300 rounded-2xl p-4 hover:shadow-lg transition"
           >
-            <img
-              src={getImageUrl(p.image)}
-              alt={p.model_name}
-              className="h-40 mx-auto object-contain"
-            />
+            <Link to={`/products/${p.id}`}>
+              {p.image && (
+                <img
+                  src={getImageUrl(p.image)}
+                  alt={p.model_name}
+                  className="h-40 mx-auto object-contain"
+                />
+              )}
 
-            <h3 className="font-semibold mt-4">{p.model_name}</h3>
+              <h3 className="font-semibold mt-4">{p.model_name}</h3>
 
-            <p className="text-sm text-gray-500">
-              {p.hashrate} TH/s · {p.power} W
-            </p>
+              <p className="text-sm text-gray-500">
+                {p.hashrate} TH/s · {p.power} W
+              </p>
 
-            <p className="text-sm text-gray-500">Algorithm: {p.algorithm}</p>
+              <p className="text-sm text-gray-500">Algorithm: {p.algorithm}</p>
 
-            <p className="text-lg font-bold mt-3">${Number(p.price).toLocaleString()}</p>
+              <p className="text-lg font-bold mt-3">${Number(p.price).toLocaleString()}</p>
+            </Link>
 
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              <Link
-                to={`/products/${p.id}`}
-                className="bg-gray-100 py-2 rounded-xl text-sm font-medium text-center"
-              >
-                View
-              </Link>
-
+            <div className="mt-4">
               <button
                 onClick={() => handleBuyNow(p)}
                 disabled={isAdding === p.id}
-                className="bg-green-600 text-white py-2 rounded-xl text-sm font-medium disabled:opacity-50"
+                className="bg-black text-white py-2 w-full rounded-xl text-sm font-medium disabled:opacity-50"
               >
                 {isAdding === p.id ? "..." : "Buy Now"}
               </button>

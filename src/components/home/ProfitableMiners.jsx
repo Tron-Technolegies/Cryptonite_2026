@@ -90,7 +90,7 @@ export default function ProfitableMiners() {
           </div>
 
           {/* FILTER TABS */}
-          <div className="flex gap-3 mt-6 md:mt-0">
+          <div className="grid grid-cols-3 gap-3 mt-6 md:mt-0">
             {tabs.map((tab) => (
               <button
                 key={tab.filter}

@@ -34,14 +34,12 @@ export default function BundleSection() {
             <h2 className="text-4xl font-extrabold mb-2">
               Exclusive <SectionHeading>Bundles</SectionHeading>
             </h2>
-            <p className="text-gray-600">
-              Get the best value with our curated mining bundles.
-            </p>
+            <p className="text-gray-600">Get the best value with our curated mining bundles.</p>
           </div>
 
           <Link
-             to="/bundles"
-             className="mt-6 md:mt-0 px-8 py-3 bg-(--primary-color) text-white font-semibold rounded-lg hover:brightness-110 transition shadow-lg"
+            to="/bundles"
+            className="mt-6 md:mt-0 px-4 py-3 bg-(--primary-color) w-full md:w-auto sm:w-fit  text-white font-semibold rounded-lg hover:brightness-110 transition shadow-lg"
           >
             View All Bundles
           </Link>
@@ -54,8 +52,7 @@ export default function BundleSection() {
               <div
                 key={i}
                 className="border border-gray-200 rounded-2xl p-6 bg-white animate-pulse h-96"
-              >
-              </div>
+              ></div>
             ))}
           </div>
         ) : bundles.length === 0 ? (
@@ -82,30 +79,30 @@ export default function BundleSection() {
 
                 {/* CONTENT */}
                 <div className="flex flex-col flex-grow">
-                    <h3 className="font-semibold text-lg mb-2 leading-snug text-gray-900 group-hover:text-(--primary-color) transition-colors">
+                  <h3 className="font-semibold text-lg mb-2 leading-snug text-gray-900 group-hover:text-(--primary-color) transition-colors">
                     {item.title}
-                    </h3>
-                    
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
-                        {item.description}
-                    </p>
+                  </h3>
 
-                    {/* PRICE */}
-                    <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                             {item.compare_at_price && (
-                                <span className="block text-sm text-gray-400 line-through">
-                                ${Number(item.compare_at_price).toLocaleString()}
-                                </span>
-                            )}
-                            <span className="text-xl font-bold text-black">
-                                ${Number(item.price).toLocaleString()}
-                            </span>
-                        </div>
-                        <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-(--primary-color) group-hover:text-white transition-colors">
-                            →
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
+                    {item.description}
+                  </p>
+
+                  {/* PRICE */}
+                  <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div>
+                      {item.compare_at_price && (
+                        <span className="block text-sm text-gray-400 line-through">
+                          ${Number(item.compare_at_price).toLocaleString()}
                         </span>
+                      )}
+                      <span className="text-xl font-bold text-black">
+                        ${Number(item.price).toLocaleString()}
+                      </span>
                     </div>
+                    <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-(--primary-color) group-hover:text-white transition-colors">
+                      →
+                    </span>
+                  </div>
                 </div>
               </Link>
             ))}

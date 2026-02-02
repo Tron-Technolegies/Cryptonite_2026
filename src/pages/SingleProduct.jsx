@@ -79,8 +79,9 @@ export default function SingleProduct() {
     const fetchSimilar = async () => {
       try {
         const response = await getProducts();
+        const items = response.data.results || response.data || [];
         // Filter products by same category or algorithm, exclude current product
-        const similar = response.data
+        const similar = items
           .filter(
             (p) =>
               p.id !== product.id &&
@@ -196,7 +197,7 @@ export default function SingleProduct() {
 
   return (
     <div className="container-x mx-auto px-6 py-16">
-      <p className="pb-5 flex items-center">
+      <div className="pb-5 flex items-center">
         <Link to="/" className="text-gray-500 hover:text-green-400">
           Home /{" "}
         </Link>
@@ -204,8 +205,8 @@ export default function SingleProduct() {
           {" "}
           Products /{" "}
         </Link>
-        <p className="text-green-500 ml-1"> {productName}</p>
-      </p>
+        <span className="text-green-500 ml-1"> {productName}</span>
+      </div>
       {/* TOP SECTION */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
         {/* Image */}
@@ -299,7 +300,7 @@ export default function SingleProduct() {
           <button
             onClick={handleBuyNow}
             disabled={isAdding}
-            className="w-full text-white py-3 rounded-lg font-medium transition-all hover:shadow-lg disabled:opacity-50"
+            className="w-full text-white py-3 rounded-lg font-medium transition-all hover:shadow-lg disabled:opacity-50 cursor-pointer"
             style={{ backgroundColor: "var(--primary-color)" }}
             onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
             onMouseLeave={(e) => (e.target.style.opacity = "1")}
@@ -354,7 +355,7 @@ export default function SingleProduct() {
         {selectedOption && !isMobile && (
           <div className="mt-6 text-center">
             <button
-              className="px-8 py-3 rounded-lg font-medium text-white transition-all hover:shadow-lg"
+              className="px-8 py-3 rounded-lg font-medium text-white transition-all hover:shadow-lg cursor-pointer"
               style={{ backgroundColor: "var(--primary-color)" }}
               onClick={() => handleProceedWithOption()}
             >
@@ -373,7 +374,7 @@ export default function SingleProduct() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-6 py-3 font-medium transition-all border-b-2 ${
+                className={`px-6 py-3 font-medium transition-all border-b-2 cursor-pointer ${
                   activeTab === tab.id
                     ? "border-green-600 text-green-600"
                     : "border-transparent text-gray-600 hover:text-gray-900"

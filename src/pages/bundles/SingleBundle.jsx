@@ -148,7 +148,20 @@ export default function SingleBundle() {
             ${Number(bundle.price).toLocaleString()}
           </p>
 
-          <p className="text-gray-600 leading-relaxed mb-8">{bundle.description}</p>
+          <p className="text-gray-600 leading-relaxed mb-6">{bundle.description}</p>
+          
+          {/* INCLUDED MINERS */}
+          <div className="mb-8">
+            <h4 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">Included Miners:</h4>
+            <div className="flex flex-wrap gap-2">
+              {bundle.items?.map((item, i) => (
+                <div key={i} className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
+                   <span className="font-bold text-green-600">{item.quantity}x</span>
+                   <span className="text-sm font-medium text-gray-800">{item.product_name || `Miner #${item.product_id}`}</span>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* QUICK SPECS */}
           <div className="grid grid-cols-2 gap-4 mb-8">

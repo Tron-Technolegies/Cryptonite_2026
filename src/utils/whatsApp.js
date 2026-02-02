@@ -1,6 +1,5 @@
-
 export const sendToWhatsApp = (formData) => {
-  const phoneNumber = "1234567890";
+  const phoneNumber = "+436802442479";
 
   const message = `
 New Contact Form Message:
@@ -19,7 +18,7 @@ Message: ${formData.message}
 
 // enquiry message
 export const sendEnquiryMessage = () => {
-  const phoneNumber = "12345677890";
+  const phoneNumber = "+436802442479";
 
   const message = "I would like to know more about Cryptonite";
   const encodedMessage = encodeURIComponent(message);

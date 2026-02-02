@@ -32,7 +32,7 @@ export default function CoinCalculator() {
       <CoinPriceGraph coin={coinData} />
 
       {/* 5️⃣ PRODUCTS */}
-      <ProductGrid coin={coin} />
+      <ProductGrid filters={{ coin: [coin], brand: [], price: [0, 100000], inStock: false }} sortBy="best" />
     </div>
   );
 }

@@ -1,7 +1,8 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import miningLocations from "../utils/miningLocations";
 import SectionHeading from "../components/ui/SectionHeading";
 import { use, useEffect } from "react";
+import { sendEnquiryMessage } from "../utils/whatsApp";
 
 const LocationDetails = () => {
   useEffect(() => window.scrollTo(0, 0), []);
@@ -75,8 +76,8 @@ const LocationDetails = () => {
               </div>
             </div>
 
-            <button className="w-full md:w-auto px-10 py-4 rounded-full bg-[var(--primary-color)] text-black font-bold hover:opacity-90 transition">
-              START MINING
+            <button className="w-full md:w-auto cursor-pointer px-10 py-4 rounded-full bg-[var(--primary-color)] text-black font-bold hover:opacity-90 transition">
+              <Link to="/shop">START MINING</Link>
             </button>
           </div>
 
@@ -130,8 +131,10 @@ const LocationDetails = () => {
               professionally managed mining facilities.
             </p>
 
-            <button className="px-12 py-4 rounded-full bg-black text-white font-bold hover:opacity-90 transition">
-              CONTACT SALES
+            <button className="px-12 py-4 rounded-full bg-black text-white cursor-pointer font-bold hover:opacity-90 transition"
+            onClick={() => sendEnquiryMessage()}>
+
+              CONTACT
             </button>
           </div>
         </div>

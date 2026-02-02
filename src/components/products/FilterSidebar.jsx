@@ -53,9 +53,8 @@ export default function FilterSidebar({ filters, setFilters }) {
           </button>
         </div>
 
-        {/* SCROLLABLE CONTENT */}
+        {/* CONTENT */}
         <div className="p-6 lg:p-0 overflow-y-auto h-[calc(100vh-64px)] lg:h-auto">
-          {/* Coin */}
           <Section title="Mineable Coin">
             {COINS.map((c) => (
               <Checkbox
@@ -67,7 +66,6 @@ export default function FilterSidebar({ filters, setFilters }) {
             ))}
           </Section>
 
-          {/* Brand */}
           <Section title="Brand">
             {BRANDS.map((b) => (
               <Checkbox
@@ -79,7 +77,6 @@ export default function FilterSidebar({ filters, setFilters }) {
             ))}
           </Section>
 
-          {/* Stock */}
           <Section title="Availability">
             <Checkbox
               label="In Stock"
@@ -88,7 +85,6 @@ export default function FilterSidebar({ filters, setFilters }) {
             />
           </Section>
 
-          {/* Price */}
           <Section title="Price Range">
             <input
               type="range"
@@ -107,7 +103,6 @@ export default function FilterSidebar({ filters, setFilters }) {
             <p className="text-sm text-gray-500 mt-2">Up to ${filters.price[1].toLocaleString()}</p>
           </Section>
 
-          {/* Clear Filters */}
           <button
             onClick={() =>
               setFilters({

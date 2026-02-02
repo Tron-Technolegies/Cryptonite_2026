@@ -84,9 +84,8 @@ export default function OptionCard({
         ))}
       </ul>
 
-      {/* Button always at bottom */}
       <button
-        className={`mt-auto w-full py-3 rounded-lg font-medium transition-all
+        className={`mt-auto w-full py-3 rounded-lg font-medium transition-all cursor-pointer
         ${
           isSelected
             ? "bg-green-600 text-white"
