@@ -21,7 +21,9 @@ export default function OptionCard({
   return (
     <div
       onClick={handleClick}
-      className={`border-2 rounded-xl p-6 transition-all cursor-pointer ${
+      className={`border-2 rounded-xl p-5 transition-all cursor-pointer
+      flex flex-col h-full
+      ${
         isSelected
           ? "border-green-600 bg-green-50"
           : available
@@ -30,8 +32,9 @@ export default function OptionCard({
       }`}
       style={isSelected ? { borderColor: "var(--primary-color)", backgroundColor: "#f0fdf4" } : {}}
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold">{title}</h3>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-bold">{title}</h3>
         {available ? (
           <span
             className="text-xs px-3 py-1 rounded-full bg-green-100"
@@ -46,55 +49,55 @@ export default function OptionCard({
         )}
       </div>
 
-      {/* Price and Location Dropdown in Flex */}
+      {/* Price + Location */}
       <div className="mb-4">
         <p className="text-2xl font-bold mb-2" style={{ color: "var(--primary-color)" }}>
           {price}
         </p>
 
         {showLocationDropdown && (
-          <div className="mt-2">
-            <select
-              value={selectedLocation.id}
-              onChange={(e) => {
-                e.stopPropagation();
-                setSelectedLocation(miningLocations.find((loc) => loc.id === e.target.value));
-              }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full p-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2"
-              style={{ focusRingColor: "var(--primary-color)" }}
-            >
-              {miningLocations.map((location) => (
-                <option key={location.id} value={location.id}>
-                  {location.name} - {location.price}/kWh
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={selectedLocation.id}
+            onChange={(e) => {
+              e.stopPropagation();
+              setSelectedLocation(miningLocations.find((loc) => loc.id === e.target.value));
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full p-2 border border-gray-300 rounded-lg text-xs"
+          >
+            {miningLocations.map((location) => (
+              <option key={location.id} value={location.id}>
+                {location.name} - {location.price}/kWh
+              </option>
+            ))}
+          </select>
         )}
       </div>
 
-      <ul className="space-y-2 mb-6">
+      {/* Features */}
+      <ul className="space-y-2 text-sm text-gray-700 mb-6">
         {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-            <span className="text-green-600 mt-0.5">•</span>
+          <li key={i} className="flex gap-2">
+            <span className="text-green-600">•</span>
             {item}
           </li>
         ))}
       </ul>
 
+      {/* Button always at bottom */}
       <button
-        className={`w-full py-3 rounded-lg font-medium transition-all ${
+        className={`mt-auto w-full py-3 rounded-lg font-medium transition-all
+        ${
           isSelected
             ? "bg-green-600 text-white"
             : available
-              ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              ? "bg-gray-100 hover:bg-gray-200"
               : "bg-gray-200 text-gray-500 cursor-not-allowed"
         }`}
         style={isSelected ? { backgroundColor: "var(--primary-color)" } : {}}
         disabled={!available}
       >
-        {isSelected ? " Selected" : available ? "Select Option" : "Order Now"}
+        {isSelected ? "Selected" : available ? "Select Option" : "Order Now"}
       </button>
     </div>
   );

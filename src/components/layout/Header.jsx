@@ -1,3 +1,4 @@
+import api from "../../api/api";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -52,7 +53,15 @@ const Header = () => {
     return () => window.removeEventListener("storage", updateCart);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await api.post("/auth/logout/", {
+        refresh: localStorage.getItem("refresh"),
+      });
+    } catch (err) {
+      console.log("Logout error", err);
+    }
+
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
     window.dispatchEvent(new Event("auth-change"));
@@ -77,7 +86,9 @@ const Header = () => {
               setOpen={() => setOpenDropdown("asic")}
               close={() => setOpenDropdown(null)}
             >
-              <DropdownItem to="/shop" onClick={() => setOpenDropdown(null)}>All Products</DropdownItem>
+              <DropdownItem to="/shop" onClick={() => setOpenDropdown(null)}>
+                All Products
+              </DropdownItem>
             </Dropdown>
 
             <Dropdown
@@ -86,10 +97,16 @@ const Header = () => {
               setOpen={() => setOpenDropdown("hosting")}
               close={() => setOpenDropdown(null)}
             >
-              <DropdownItem to="/hosting" onClick={() => setOpenDropdown(null)}>All Hosting</DropdownItem>
+              <DropdownItem to="/hosting" onClick={() => setOpenDropdown(null)}>
+                All Hosting
+              </DropdownItem>
               <div className="border-t my-1" />
               {miningLocations.map((loc) => (
-                <DropdownItem key={loc.id} to={`/locations/${loc.id}`} onClick={() => setOpenDropdown(null)}>
+                <DropdownItem
+                  key={loc.id}
+                  to={`/locations/${loc.id}`}
+                  onClick={() => setOpenDropdown(null)}
+                >
                   {loc.name}
                 </DropdownItem>
               ))}
@@ -101,10 +118,16 @@ const Header = () => {
               setOpen={() => setOpenDropdown("calculator")}
               close={() => setOpenDropdown(null)}
             >
-              <DropdownItem to="/calculator" onClick={() => setOpenDropdown(null)}>Common Calculator</DropdownItem>
+              <DropdownItem to="/calculator" onClick={() => setOpenDropdown(null)}>
+                Common Calculator
+              </DropdownItem>
               <div className="border-t my-1" />
               {Object.values(COINS).map((coin) => (
-                <DropdownItem key={coin.symbol} to={`/calculator/${coin.symbol}`} onClick={() => setOpenDropdown(null)}>
+                <DropdownItem
+                  key={coin.symbol}
+                  to={`/calculator/${coin.symbol}`}
+                  onClick={() => setOpenDropdown(null)}
+                >
                   {coin.name} Mining Calculator
                 </DropdownItem>
               ))}
@@ -117,12 +140,18 @@ const Header = () => {
               close={() => setOpenDropdown(null)}
             >
               {blogPosts.map((blog) => (
-                <DropdownItem key={blog.id} to={`/blogs/${blog.id}`} onClick={() => setOpenDropdown(null)}>
+                <DropdownItem
+                  key={blog.id}
+                  to={`/blogs/${blog.id}`}
+                  onClick={() => setOpenDropdown(null)}
+                >
                   {blog.title}
                 </DropdownItem>
               ))}
               <div className="border-t my-1" />
-              <DropdownItem to="/#faq" onClick={() => setOpenDropdown(null)}>FAQ</DropdownItem>
+              <DropdownItem to="/#faq" onClick={() => setOpenDropdown(null)}>
+                FAQ
+              </DropdownItem>
             </Dropdown>
 
             <Dropdown
@@ -131,9 +160,15 @@ const Header = () => {
               setOpen={() => setOpenDropdown("company")}
               close={() => setOpenDropdown(null)}
             >
-              <DropdownItem to="/about" onClick={() => setOpenDropdown(null)}>About Us</DropdownItem>
-              <DropdownItem to="/contact" onClick={() => setOpenDropdown(null)}>Contact</DropdownItem>
-              <DropdownItem to="/terms" onClick={() => setOpenDropdown(null)}>Terms & Conditions</DropdownItem>
+              <DropdownItem to="/about" onClick={() => setOpenDropdown(null)}>
+                About Us
+              </DropdownItem>
+              <DropdownItem to="/contact" onClick={() => setOpenDropdown(null)}>
+                Contact
+              </DropdownItem>
+              <DropdownItem to="/terms" onClick={() => setOpenDropdown(null)}>
+                Terms & Conditions
+              </DropdownItem>
             </Dropdown>
           </nav>
 
@@ -155,9 +190,9 @@ const Header = () => {
                 <Link to="/profile" className="text-2xl hover:text-green-500" title="My Profile">
                   <FiUser />
                 </Link>
-                <button 
+                <button
                   onClick={handleLogout}
-                  className="text-xl hover:text-red-500" 
+                  className="text-xl hover:text-red-500"
                   title="Logout"
                 >
                   <FiLogOut />
@@ -257,7 +292,7 @@ const Header = () => {
               <Link to="/profile" onClick={() => setMobileOpen(false)}>
                 My Profile
               </Link>
-              <button 
+              <button
                 onClick={() => {
                   handleLogout();
                   setMobileOpen(false);
@@ -327,7 +362,11 @@ const Dropdown = ({ title, open, setOpen, close, children }) => {
 };
 
 const DropdownItem = ({ to, children, onClick }) => (
-  <Link to={to} onClick={onClick} className="block px-4 py-2 text-sm hover:bg-green-500/10 hover:text-green-500">
+  <Link
+    to={to}
+    onClick={onClick}
+    className="block px-4 py-2 text-sm hover:bg-green-500/10 hover:text-green-500"
+  >
     {children}
   </Link>
 );

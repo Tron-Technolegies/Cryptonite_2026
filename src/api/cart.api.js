@@ -30,7 +30,7 @@ export const addToCart = async (productId, bundleId, quantity = 1) => {
 // Update cart item quantity
 export const updateCartItem = async (itemId, quantity) => {
     try {
-        const response = await api.patch(`/cart/update/${itemId}/`, { quantity });
+        const response = await api.patch(`/cart/${itemId}/update/`, { quantity });
         return response.data;
     } catch (error) {
         console.error("Error updating cart item:", error);
@@ -41,7 +41,7 @@ export const updateCartItem = async (itemId, quantity) => {
 // Remove item from cart
 export const removeFromCart = async (itemId) => {
     try {
-        const response = await api.delete(`/cart/remove/${itemId}/`);
+        const response = await api.delete(`/cart/${itemId}/delete/`);
         return response.data;
     } catch (error) {
         console.error("Error removing from cart:", error);

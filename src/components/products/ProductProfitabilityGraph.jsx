@@ -1,14 +1,26 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 export default function ProductProfitabilityGraph({ product, btcPrice }) {
   const [numberOfMiners, setNumberOfMiners] = useState(1);
   const [electricityCost, setElectricityCost] = useState(0.058);
   const [timePeriod, setTimePeriod] = useState("month"); // day, week, month
 
+  // Debug logging for profitability graph
+  console.log("[ProductProfitabilityGraph] BTC Price:", btcPrice);
+  console.log("[ProductProfitabilityGraph] Product Data:", { hashrate: product.hashrate, power: product.power });
+
   // Use proper calculation logic from working calculator
-  const calculateMetrics = () => {
-    const powerKW = (product.power || 2760) / 1000;
-    const hashrateInTH = product.hashrate || 120;
+  const metrics = useMemo(() => {
+    // Helper to parse values like "120 TH/s" or "3000 W"
+    const parseValue = (val) => {
+        if (!val) return 0;
+        if (typeof val === 'number') return val;
+        const num = parseFloat(val.toString().replace(/[^0-9.]/g, ''));
+        return isNaN(num) ? 0 : num;
+    };
+
+    const powerKW = parseValue(product.power || 2760) / 1000;
+    const hashrateInTH = parseValue(product.hashrate || 120);
 
     // Bitcoin network parameters
     const networkHashrate = 600000000; // 600 EH/s in TH/s
@@ -24,6 +36,16 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
     const dailyElectricityCost = powerKW * 24 * electricityCost;
     const dailyProfit = dailyRevenue - dailyElectricityCost;
 
+    console.log("[Profitability Calculation]:", {
+      powerKW,
+      hashrateInTH,
+      currentBtcPrice,
+      coinsPerDay,
+      dailyRevenue,
+      dailyElectricityCost,
+      dailyProfit,
+    });
+
     // Multiply by number of miners
     return {
       salesDay: dailyRevenue * numberOfMiners,
@@ -35,12 +57,10 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
       dailyProfit: dailyProfit,
       coinsPerDay: coinsPerDay * numberOfMiners,
     };
-  };
-
-  const metrics = calculateMetrics();
+  }, [product.power, product.hashrate, btcPrice, electricityCost, numberOfMiners]);
 
   // Generate graph data based on selected time period
-  const generateGraphData = () => {
+  const graphData = useMemo(() => {
     const data = [];
     const periods = {
       day: { count: 24, label: (i) => `${i}h` },
@@ -52,8 +72,10 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
     const profitPerPeriod = timePeriod === "day" ? metrics.dailyProfit / 24 : metrics.dailyProfit;
 
     for (let i = 0; i < period.count; i++) {
-      // Add realistic variance
-      const variance = (Math.random() - 0.5) * 0.15;
+      // Add realistic variance (Deterministic to satisfy linter purity rules)
+      const seed = (i + 1) * (timePeriod.length);
+      const pseudoRandom = Math.abs(Math.sin(seed));
+      const variance = (pseudoRandom - 0.5) * 0.15;
       const profit = profitPerPeriod * (1 + variance);
 
       data.push({
@@ -62,9 +84,8 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
       });
     }
     return data;
-  };
+  }, [timePeriod, metrics.dailyProfit]);
 
-  const graphData = generateGraphData();
   const maxProfit = Math.max(...graphData.map((d) => Math.abs(d.profit)));
   const minProfit = Math.min(...graphData.map((d) => d.profit));
   const avgProfit = graphData.reduce((acc, d) => acc + d.profit, 0) / graphData.length;
@@ -165,6 +186,7 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
         </div>
 
         {/* Right: Graph */}
+
         <div className="flex-1 bg-gray-50 rounded-lg p-4">
           <div className="flex justify-between items-center mb-3">
             <h4 className="text-base font-bold">Profit Graph</h4>

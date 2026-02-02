@@ -19,15 +19,15 @@ const StripeWrapper = ({ clientSecret, children }) => {
   const options = {
     clientSecret,
     appearance: {
-        theme: 'night',
+        theme: 'stripe', // Clean white/blue minimal design
         variables: {
-            colorPrimary: '#4ade80', // green-400
-            colorBackground: '#1f2937', // gray-800
-            colorText: '#f3f4f6', // gray-100
-            colorDanger: '#ef4444', // red-500
+            colorPrimary: '#22c55e', // green-500
+            colorBackground: '#ffffff',
+            colorText: '#1f2937',
+            colorDanger: '#ef4444',
             fontFamily: 'Inter, system-ui, sans-serif',
             spacingUnit: '4px',
-            borderRadius: '12px',
+            borderRadius: '8px',
         },
     },
   };

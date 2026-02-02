@@ -38,13 +38,6 @@ export default function MiningCalculator() {
 
   const [hasCalculated, setHasCalculated] = useState(false);
 
-  // Fetch BTC price
-  useEffect(() => {
-    fetchBTCPrice();
-    const interval = setInterval(fetchBTCPrice, 86400000);
-    return () => clearInterval(interval);
-  }, []);
-
   const fetchBTCPrice = async () => {
     try {
       const res = await fetch(
@@ -56,6 +49,13 @@ export default function MiningCalculator() {
       console.error("BTC fetch failed");
     }
   };
+
+  // Fetch BTC price
+  useEffect(() => {
+    fetchBTCPrice();
+    const interval = setInterval(fetchBTCPrice, 86400000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Calculation
   const calculatePeriod = (days) => {

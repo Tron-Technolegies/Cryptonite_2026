@@ -1,23 +1,33 @@
 import { useState } from "react";
 import { FaStar } from "react-icons/fa";
+import { createReview } from "../../api/reviews.api";
+import { toast } from "react-toastify";
 
-export default function ReviewForm({ onClose, productName }) {
+export default function ReviewForm({ onClose, productName, productId, onSuccess }) {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
     rating: 5,
-    title: "",
     comment: "",
   });
 
   const [hoveredRating, setHoveredRating] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Backend integration
-    console.log("Review submitted:", formData);
-    alert("Thank you for your review! It will be published after moderation.");
-    onClose();
+    if (!productId) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await createReview(productId, formData);
+      toast.success("Thank you for your review!");
+      if (onSuccess) onSuccess(response);
+      onClose();
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.error || "Failed to submit review. Are you logged in?");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -40,33 +50,7 @@ export default function ReviewForm({ onClose, productName }) {
         <h3 className="text-2xl font-bold mb-2">Write a Review</h3>
         <p className="text-gray-600 mb-6">Share your experience with {productName}</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Your Name *</label>
-            <input
-              type="text"
-              name="name"
-              required
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="John Doe"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Email *</label>
-            <input
-              type="email"
-              name="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="john@example.com"
-            />
-            <p className="text-xs text-gray-500 mt-1">Your email will not be published</p>
-          </div>
+         <form onSubmit={handleSubmit} className="space-y-4">
 
           <div>
             <label className="block text-sm font-medium mb-2">Rating *</label>
@@ -92,18 +76,6 @@ export default function ReviewForm({ onClose, productName }) {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Review Title *</label>
-            <input
-              type="text"
-              name="title"
-              required
-              value={formData.title}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="Great product!"
-            />
-          </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Your Review *</label>
@@ -128,12 +100,13 @@ export default function ReviewForm({ onClose, productName }) {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 text-white rounded-lg transition-colors"
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2 text-white rounded-lg transition-colors disabled:opacity-50"
               style={{ backgroundColor: "var(--primary-color)" }}
               onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
               onMouseLeave={(e) => (e.target.style.opacity = "1")}
             >
-              Submit Review
+              {isSubmitting ? "Submitting..." : "Submit Review"}
             </button>
           </div>
         </form>

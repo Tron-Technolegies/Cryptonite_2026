@@ -1,7 +1,7 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import products from "../utils/products";
+import { getProduct, getProducts } from "../api/product.api";
 import { getCoinData } from "../api/price.api";
 import Spec from "../components/products/Spec";
 import OptionCard from "../components/products/OptionCard";
@@ -12,13 +12,12 @@ import WarrantySection from "../components/products/WarrantySection";
 import HostingSection from "../components/products/HostingSection";
 import ShippingSection from "../components/products/ShippingSection";
 import FAQSection from "../components/products/FAQSection";
-import { FiBox, FiCpu, FiShield, FiTruck, FiDollarSign } from "react-icons/fi";
+import { FiBox, FiCpu, FiShield, FiTruck } from "react-icons/fi";
 import { TfiBolt } from "react-icons/tfi";
 import { FaCoins } from "react-icons/fa";
-import { LiaTachometerAltSolid } from "react-icons/lia";
 import { PiSpeedometerBold } from "react-icons/pi";
-import miningLocations from "../utils/miningLocations";
 import { addToCart } from "../api/cart.api";
+import { getImageUrl } from "../utils/imageUtils";
 
 export default function SingleProduct() {
   const navigate = useNavigate();
@@ -28,15 +27,37 @@ export default function SingleProduct() {
   }, []);
 
   const { id } = useParams();
-  const product = products.find((p) => p.id === Number(id));
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [coinData, setCoinData] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedOption, setSelectedOption] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [similarProducts, setSimilarProducts] = useState([]);
+  const isMobile = window.innerWidth < 768;
 
   useEffect(() => {
-    // Fetch only the coin that this machine mines
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await getProduct(id);
+        setProduct(response.data);
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        toast.error("Failed to load product details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
+  // Fetch coin data for profitability calculator
+  useEffect(() => {
+    if (!product) return;
+
+    const coinCode = product.minable_coins?.split(",")[0]?.trim();
     const coinMap = {
       BTC: "bitcoin",
       LTC: "litecoin",
@@ -45,11 +66,47 @@ export default function SingleProduct() {
       ETC: "ethereum-classic",
     };
 
-    const coinId = coinMap[product?.coin];
+    const coinId = coinMap[coinCode];
     if (coinId) {
       getCoinData(coinId).then(setCoinData).catch(console.error);
     }
   }, [product]);
+
+  // Fetch similar products
+  useEffect(() => {
+    if (!product) return;
+
+    const fetchSimilar = async () => {
+      try {
+        const response = await getProducts();
+        // Filter products by same category or algorithm, exclude current product
+        const similar = response.data
+          .filter(
+            (p) =>
+              p.id !== product.id &&
+              (p.algorithm === product.algorithm || p.category === product.category),
+          )
+          .slice(0, 3);
+        setSimilarProducts(similar);
+      } catch (err) {
+        console.error("Error fetching similar products:", err);
+      }
+    };
+
+    fetchSimilar();
+  }, [product]);
+
+  const coinCode = product?.minable_coins?.split(",")[0];
+
+  const coinMap = {
+    BTC: "bitcoin",
+    LTC: "litecoin",
+    KAS: "kaspa",
+    DOGE: "dogecoin",
+    ETC: "ethereum-classic",
+  };
+
+  const coinId = coinMap[coinCode];
 
   const handleBuyNow = async () => {
     if (isAdding) return;
@@ -57,7 +114,7 @@ export default function SingleProduct() {
     try {
       // Add to Backend Cart
       await addToCart(product.id, null, quantity);
-      
+
       // Navigate to Checkout (Source of truth is now backend cart)
       navigate("/checkout");
     } catch (err) {
@@ -67,44 +124,65 @@ export default function SingleProduct() {
       setIsAdding(false);
     }
   };
-
-  const handleOptionSelect = (option) => {
+  const handleOptionSelect = async (option) => {
     setSelectedOption(option);
+
+    if (isMobile) {
+      setTimeout(() => {
+        handleProceedWithOption(option);
+      }, 150);
+    }
   };
-  
-  const handleProceedWithOption = async () => {
-    if (!selectedOption) {
+
+  const handleProceedWithOption = async (optionOverride) => {
+    const option = optionOverride || selectedOption;
+
+    if (!option) {
       toast.error("Please select a deployment option");
       return;
     }
-    
-    if (selectedOption === 'Shipment') {
-        // Shipment is effectively "Buy Now"
-        handleBuyNow();
-        return;
+
+    if (option === "Shipment") {
+      handleBuyNow();
+      return;
     }
 
     if (isAdding) return;
     setIsAdding(true);
+
     try {
-      // Add to Backend Cart
       await addToCart(product.id, null, quantity);
-      
-      // Navigate to Checkout
-      navigate("/checkout", { 
-        state: { 
-          purchaseType: selectedOption.toLowerCase() 
-        } 
+
+      navigate("/checkout", {
+        state: {
+          purchaseType: option.toLowerCase(),
+        },
       });
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data?.error || "Failed to add to cart. Are you logged in?");
+      toast.error(err.response?.data?.error || "Failed to add to cart");
     } finally {
       setIsAdding(false);
     }
   };
 
-  if (!product) return <p className="text-center py-20">Product not found</p>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center py-40">
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-b-2"
+          style={{ borderColor: "var(--primary-color)" }}
+        ></div>
+      </div>
+    );
+
+  if (!product) return <p className="text-center py-20 text-xl font-medium">Product not found</p>;
+
+  // Map backend field names to match local names or use them directly
+  const productName = product.model_name;
+  const productPrice = product.price;
+  const productBasePrice = product.price;
+  const productCoin = product.minable_coins?.split(",")[0] || "BTC"; // Default to BTC if not specified
 
   const tabs = [
     { id: "overview", label: "Overview" },
@@ -126,56 +204,67 @@ export default function SingleProduct() {
           {" "}
           Products /{" "}
         </Link>
-        <p className="text-green-500"> {product.name}</p>
+        <p className="text-green-500 ml-1"> {productName}</p>
       </p>
       {/* TOP SECTION */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
         {/* Image */}
-        <img
-          src={product.image}
-          alt={product.name}
-          className="rounded-xl border border-gray-200 shadow-lg"
-        />
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex items-center justify-center p-8">
+          <img
+            src={getImageUrl(product.image)}
+            alt={productName}
+            className="max-h-[500px] w-auto object-contain hover:scale-105 transition-transform duration-500"
+          />
+        </div>
 
         {/* Info */}
         <div>
           <div className="flex items-center gap-3 mb-2">
             <span
-              className="text-xs px-3 py-1 rounded-full"
+              className="text-xs px-3 py-1 rounded-full font-medium"
               style={{ backgroundColor: "var(--primary-color)", color: "white" }}
             >
               {product.brand}
             </span>
-            <span
-              className="bg-green-100 text-xs px-3 py-1 rounded-full"
-              style={{ color: "var(--primary-color)" }}
-            >
-              In Stock
+            {product.is_available && (
+              <span
+                className="bg-green-100 text-xs px-3 py-1 rounded-full font-medium"
+                style={{ color: "var(--primary-color)" }}
+              >
+                In Stock
+              </span>
+            )}
+            <span className="text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-600 font-medium lowercase">
+              {product.category}
             </span>
           </div>
 
-          <h1 className="text-3xl font-bold mb-3">{product.name}</h1>
+          <h1 className="text-4xl font-bold mb-3">{productName}</h1>
 
-          <p className="text-3xl font-semibold mb-4" style={{ color: "var(--primary-color)" }}>
-            ${product.price?.toLocaleString() || "Contact for Price"}
-          </p>
+          <div className="flex items-baseline gap-3 mb-4">
+            <p className="text-3xl font-bold" style={{ color: "var(--primary-color)" }}>
+              ${productPrice?.toLocaleString() || "Contact for Price"}
+            </p>
+            {product.discount_percentage > 0 && (
+              <p className="text-xl text-gray-400 line-through">
+                ${parseFloat(productBasePrice)?.toLocaleString()}
+              </p>
+            )}
+            {product.discount_percentage > 0 && (
+              <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-md font-bold">
+                -{product.discount_percentage}%
+              </span>
+            )}
+          </div>
 
-          <p className="text-gray-600 leading-relaxed mb-6">{product.description}</p>
+          <p className="text-gray-600 leading-relaxed mb-8">{product.description}</p>
 
           {/* Specs */}
-          <div className="grid grid-cols-2  gap-4 mb-6">
-            <Spec
-              icon={<PiSpeedometerBold />}
-              label="Hashrate"
-              value={`${product.hashrate || product.hashRate} ${product.hashrateUnit || ""}`}
-            />
-            <Spec
-              icon={<TfiBolt />}
-              label="Power"
-              value={`${product.power || product.powerConsumption} W`}
-            />
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <Spec icon={<PiSpeedometerBold />} label="Hashrate" value={product.hashrate} />
+            <Spec icon={<TfiBolt />} label="Power" value={`${product.power} W`} />
             <Spec icon={<FiCpu />} label="Algorithm" value={product.algorithm} />
-            <Spec icon={<FaCoins />} label="Coin" value={product.coin} />
+            <Spec icon={<FaCoins />} label="Coins" value={product.minable_coins} />
           </div>
 
           {/* Quantity Selector */}
@@ -215,10 +304,10 @@ export default function SingleProduct() {
             onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
             onMouseLeave={(e) => (e.target.style.opacity = "1")}
           >
-            {isAdding ? 'Processing...' : 'Buy Now'}
+            {isAdding ? "Processing..." : "Buy Now"}
           </button>
           <div className="grid grid-cols-3 gap-6 mt-8 text-center text-xs text-gray-600">
-            <Trust icon={<FiShield />} title="12 Months" text="Warranty" />
+            <Trust icon={<FiShield />} title={product.warranty || "12 Months"} text="Warranty" />
             <Trust icon={<FiTruck />} title="Secure" text="Global Shipping" />
             <Trust icon={<FiBox />} title="Insured" text="Safe Packaging" />
           </div>
@@ -262,12 +351,12 @@ export default function SingleProduct() {
           />
         </div>
 
-        {selectedOption && (
+        {selectedOption && !isMobile && (
           <div className="mt-6 text-center">
             <button
               className="px-8 py-3 rounded-lg font-medium text-white transition-all hover:shadow-lg"
               style={{ backgroundColor: "var(--primary-color)" }}
-              onClick={handleProceedWithOption}
+              onClick={() => handleProceedWithOption()}
             >
               Proceed to Checkout ({selectedOption})
             </button>
@@ -278,7 +367,7 @@ export default function SingleProduct() {
       {/* TABBED SECTIONS */}
       <div className="mb-16">
         {/* Tab Navigation */}
-        <div className="border-b border-gray-200 mb-8  overflow-x-auto">
+        <div className="border-b border-gray-200 mb-8 overflow-x-auto">
           <div className="flex gap-2 min-w-max">
             {tabs.map((tab) => (
               <button
@@ -327,7 +416,9 @@ export default function SingleProduct() {
             </div>
           )}
           {activeTab === "specifications" && <ProductSpecifications product={product} />}
-          {activeTab === "reviews" && <ProductReviews productName={product.name} />}
+          {activeTab === "reviews" && (
+            <ProductReviews productId={product.id} productName={productName} />
+          )}
           {activeTab === "warranty" && <WarrantySection />}
           {activeTab === "hosting" && <HostingSection />}
           {activeTab === "shipping" && <ShippingSection />}
@@ -353,33 +444,43 @@ export default function SingleProduct() {
 
       {/* SIMILAR PRODUCTS */}
       <div className="bg-white rounded-xl border border-gray-200 p-8">
-        <h2 className="text-2xl font-bold mb-6">Similar Products</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {products
-            .filter((p) => p.id !== product.id && p.coin === product.coin)
-            .slice(0, 3)
-            .map((similarProduct) => (
-              <a
-                key={similarProduct.id}
-                href={`/products/${similarProduct.id}`}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Similar Products</h2>
+          <Link
+            to="/shop"
+            className="text-sm font-medium hover:underline"
+            style={{ color: "var(--primary-color)" }}
+          >
+            View All →
+          </Link>
+        </div>
+
+        {similarProducts.length === 0 ? (
+          <p className="text-gray-500 italic">Loading similar products...</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {similarProducts.map((p) => (
+              <Link
+                key={p.id}
+                to={`/products/${p.id}`}
                 className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow"
               >
                 <img
-                  src={similarProduct.image}
-                  alt={similarProduct.name}
-                  className="w-full h-48 object-cover rounded-lg mb-4"
+                  src={p.image}
+                  alt={p.model_name}
+                  className="w-full h-48 object-contain rounded-lg mb-4"
                 />
-                <h3 className="font-bold text-lg mb-2">{similarProduct.name}</h3>
+                <h3 className="font-bold text-lg mb-2">{p.model_name}</h3>
                 <p className="text-sm text-gray-600 mb-2">
-                  {similarProduct.hashrate || similarProduct.hashRate}{" "}
-                  {similarProduct.hashrateUnit || "TH/s"}
+                  {p.hashrate} • {p.power}W
                 </p>
                 <p className="text-xl font-bold" style={{ color: "var(--primary-color)" }}>
-                  ${similarProduct.price?.toLocaleString()}
+                  ${Number(p.price).toLocaleString()}
                 </p>
-              </a>
+              </Link>
             ))}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

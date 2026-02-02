@@ -1,28 +1,46 @@
-import { shippingInfo } from "../../utils/productDetails";
 import { FaShippingFast, FaBox, FaHandHoldingUsd, FaMapMarkedAlt } from "react-icons/fa";
+
+const shippingInfo = {
+  global: {
+    title: "Global Shipping Available",
+    description: "We ship ASIC miners worldwide using trusted international carriers including DHL, FedEx, UPS, and TNT. All shipments are fully insured and include end-to-end tracking for your peace of mind."
+  },
+  packaging: {
+    title: "Secure Packaging",
+    description: "Each miner is carefully packaged in the original manufacturer packaging with additional protective materials to ensure safe transit. All packages are inspected and sealed before dispatch."
+  },
+  pickup: {
+    title: "Self-Pickup Option",
+    description: "Prefer to collect your order in person? Visit our Shenzhen facility to pick up your ASIC miner directly. Schedule a pickup appointment with our team and avoid shipping costs."
+  },
+  hostingToShipping: {
+    title: "Ship From Hosting",
+    description: "Miners previously hosted at our facility can be shipped to your desired location. Simply submit a shipping request, and we'll handle packaging and dispatch from our secure data centers."
+  }
+};
 
 export default function ShippingSection() {
   const sections = [
     {
       icon: FaShippingFast,
       title: shippingInfo.global.title,
-      content: shippingInfo.global.description
+      content: shippingInfo.global.description,
     },
     {
       icon: FaBox,
       title: shippingInfo.packaging.title,
-      content: shippingInfo.packaging.description
+      content: shippingInfo.packaging.description,
     },
     {
       icon: FaHandHoldingUsd,
       title: shippingInfo.pickup.title,
-      content: shippingInfo.pickup.description
+      content: shippingInfo.pickup.description,
     },
     {
       icon: FaMapMarkedAlt,
       title: shippingInfo.hostingToShipping.title,
-      content: shippingInfo.hostingToShipping.description
-    }
+      content: shippingInfo.hostingToShipping.description,
+    },
   ];
 
   return (
@@ -33,13 +51,13 @@ export default function ShippingSection() {
         {sections.map((section, index) => {
           const Icon = section.icon;
           return (
-            <div 
+            <div
               key={index}
               className="border border-gray-200 rounded-lg p-5 hover:shadow-lg transition-all hover:border-green-500"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-3 rounded-full bg-green-100">
-                  <Icon className="text-xl" style={{ color: 'var(--primary-color)' }} />
+                  <Icon className="text-xl" style={{ color: "var(--primary-color)" }} />
                 </div>
                 <h4 className="font-bold text-lg">{section.title}</h4>
               </div>
@@ -79,8 +97,10 @@ export default function ShippingSection() {
           <div>
             <h5 className="font-semibold mb-1">Standard Delivery Timeline</h5>
             <p className="text-sm text-gray-700">
-              Most orders are delivered within <span className="font-semibold">5-7 business days</span> from our Shenzhen facility. 
-              All shipments include full tracking and insurance. Bulk orders may have custom delivery arrangements.
+              Most orders are delivered within{" "}
+              <span className="font-semibold">5-7 business days</span> from our Shenzhen facility.
+              All shipments include full tracking and insurance. Bulk orders may have custom
+              delivery arrangements.
             </p>
           </div>
         </div>

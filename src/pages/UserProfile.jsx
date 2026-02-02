@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProfileSidebar from "../components/userprofile/ProfileSidebar";
 import ProfileHeader from "../components/userprofile/ProfileHeader";
 import PersonalInfo from "../components/userprofile/PersonalInfo";
@@ -6,6 +6,9 @@ import AddressSection from "../components/userprofile/AddressSection";
 import SecuritySection from "../components/userprofile/SecuritySection";
 import PreferencesSection from "../components/userprofile/PreferencesSection";
 import OrderHistory from "../components/userprofile/OrderHistory";
+import api from "../api/api";
+import Loading from "../components/ui/Loading";
+import { adaptUser } from "../utils/userAdapter";
 
 // Dummy Data
 const dummyUser = {
@@ -100,21 +103,44 @@ const dummyOrders = [
 
 export default function UserProfile() {
   const [activeSection, setActiveSection] = useState("personal");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    api
+      .get("/auth/me/")
+      .then((res) => {
+        setUser(adaptUser(res.data));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
+
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    api
+      .get("/orders/my-orders/")
+      .then((res) => setOrders(res.data))
+      .catch(() => setOrders([]));
+  }, []);
+
+  if (!user) return <Loading />;
 
   const renderSection = () => {
     switch (activeSection) {
       case "personal":
-        return <PersonalInfo user={dummyUser} />;
+        return <PersonalInfo user={user} />;
       case "address":
-        return <AddressSection addresses={dummyAddresses} />;
+        return <AddressSection />;
       case "security":
         return <SecuritySection />;
       case "preferences":
         return <PreferencesSection />;
       case "orders":
-        return <OrderHistory orders={dummyOrders} />;
+        return <OrderHistory orders={orders} />;
       default:
-        return <PersonalInfo user={dummyUser} />;
+        return <PersonalInfo user={user} />;
     }
   };
 
@@ -129,15 +155,12 @@ export default function UserProfile() {
 
       <hr className="border-gray-300 mb-8" />
 
-      <ProfileHeader user={dummyUser} />
+      <ProfileHeader user={user} />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar - Fixed on larger screens */}
         <div className="lg:col-span-1">
-          <ProfileSidebar
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-          />
+          <ProfileSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
         </div>
 
         {/* Main Content */}

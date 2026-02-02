@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { FaEdit } from "react-icons/fa";
+import api from "../../api/api";
+import { toast } from "react-toastify";
 
 export default function PersonalInfo({ user }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -12,6 +14,16 @@ export default function PersonalInfo({ user }) {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    try {
+      await api.patch("/auth/update-profile/", formData);
+      toast.success("Profile updated");
+      setIsEditing(false);
+    } catch {
+      toast.error("Failed to update profile");
+    }
   };
 
   return (
@@ -29,9 +41,7 @@ export default function PersonalInfo({ user }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            First Name
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
           <input
             type="text"
             name="firstName"
@@ -43,9 +53,7 @@ export default function PersonalInfo({ user }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Last Name
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
           <input
             type="text"
             name="lastName"
@@ -57,9 +65,7 @@ export default function PersonalInfo({ user }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Phone Number
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
           <input
             type="tel"
             name="phone"
@@ -71,9 +77,7 @@ export default function PersonalInfo({ user }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Email address
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Email address</label>
           <input
             type="email"
             name="email"
@@ -95,8 +99,7 @@ export default function PersonalInfo({ user }) {
           </button>
           <button
             onClick={() => {
-              // Save logic here
-              setIsEditing(false);
+              handleSave();
             }}
             className="px-6 py-2 bg-[#00c336] text-white rounded-lg hover:bg-[#00a02d] transition-colors"
           >

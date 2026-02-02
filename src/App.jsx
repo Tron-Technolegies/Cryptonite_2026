@@ -24,6 +24,9 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import BundleProducts from "./pages/bundles/BundleProducts";
 import SingleBundle from "./pages/bundles/SingleBundle";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import EventsPage from "./pages/EventsPage";
+import EventDetailsPage from "./pages/EventDetailsPage";
 import { ToastContainer } from "react-toastify";
 
 const router = createBrowserRouter([
@@ -71,6 +74,9 @@ const router = createBrowserRouter([
       { path: "bundles", element: <BundleProducts /> },
       { path: "bundles/:id", element: <SingleBundle /> },
       { path: "checkout", element: <CheckoutPage /> },
+      { path: "payment-success", element: <PaymentSuccessPage /> },
+      { path: "events", element: <EventsPage /> },
+      { path: "events/:slug", element: <EventDetailsPage /> },
     ],
   },
 ]);

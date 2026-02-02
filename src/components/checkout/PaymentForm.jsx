@@ -43,20 +43,20 @@ export default function PaymentForm({ amount, onSuccess }) {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto">
-      <div className="bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl p-8 shadow-2xl">
+      <div className="bg-white border-2 border-blue-100 rounded-2xl p-8 shadow-lg">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-100">
             <div>
-                <h3 className="text-2xl font-bold text-white mb-2">Payment Details</h3>
-                <p className="text-gray-400 text-sm">Complete your purchase securely</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Payment Details</h3>
+                <p className="text-gray-600 text-sm">Complete your purchase securely</p>
             </div>
-            <div className="h-12 w-12 bg-gray-800 rounded-full flex items-center justify-center border border-gray-700">
-                <FiCreditCard className="text-green-400 text-xl" />
+            <div className="h-14 w-14 bg-blue-50 rounded-full flex items-center justify-center border-2 border-blue-200">
+                <FiCreditCard className="text-blue-600 text-2xl" />
             </div>
         </div>
         
         {/* Payment Element */}
-        <div className="mb-8 p-1">
+        <div className="mb-8">
             <PaymentElement 
                 id="payment-element" 
                 options={{ 
@@ -67,7 +67,7 @@ export default function PaymentForm({ amount, onSuccess }) {
         
         {/* Error Message */}
         {message && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 text-red-500 rounded-xl flex items-start gap-3 text-sm animate-fadeIn">
+          <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 text-red-700 rounded-xl flex items-start gap-3 text-sm animate-fadeIn">
             <FiAlertCircle className="mt-0.5 text-lg flex-shrink-0" /> 
             <span>{message}</span>
           </div>
@@ -77,9 +77,11 @@ export default function PaymentForm({ amount, onSuccess }) {
         <button
           disabled={isLoading || !stripe || !elements}
           id="submit"
-          className="group relative w-full bg-green-500 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-green-500/20 overflow-hidden"
+          className="group relative w-full text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg overflow-hidden"
+          style={{ backgroundColor: "var(--primary-color)" }}
+          onMouseEnter={(e) => !isLoading && (e.currentTarget.style.transform = "translateY(-2px)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0px)")}
         >
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
           
           {isLoading ? (
             <span className="flex items-center justify-center gap-3">
@@ -89,15 +91,15 @@ export default function PaymentForm({ amount, onSuccess }) {
           ) : (
             <span className="flex items-center justify-center gap-2">
                 Pay <span className="font-mono">${amount?.toLocaleString() || "0.00"}</span>
-                <FiLock className="text-white/70" />
+                <FiLock className="text-white/80" />
             </span>
           )}
         </button>
 
         {/* Footer */}
         <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-500">
-            <FiCheckCircle className="text-green-500" />
-            <span className="font-medium">Encrypted & Secure Payment</span>
+            <FiCheckCircle className="text-green-600" />
+            <span className="font-medium">Encrypted & Secure Payment via Stripe</span>
         </div>
       </div>
     </form>

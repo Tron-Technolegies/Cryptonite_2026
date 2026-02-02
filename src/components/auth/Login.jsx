@@ -125,21 +125,23 @@ const Login = () => {
           {loading ? "Signing in..." : "Sign In"}
         </button>
       </form>
-      <button
-        onClick={async () => {
-          try {
-            await api.post("/auth/resend-verification/", {
-              email: location.state?.email,
-            });
-            toast.success("Verification email sent again.");
-          } catch {
-            toast.error("Failed to resend verification email.");
-          }
-        }}
-        className="text-sm text-green-600 font-semibold hover:text-green-700"
-      >
-        Resend verification email
-      </button>
+      {location.state?.fromSignup && (
+        <button
+          onClick={async () => {
+            try {
+              await api.post("/auth/resend-verification/", {
+                email: location.state?.email,
+              });
+              toast.success("Verification email sent again.");
+            } catch {
+              toast.error("Failed to resend verification email.");
+            }
+          }}
+          className="text-sm text-green-600 font-semibold hover:text-green-700 mt-4 block text-center w-full"
+        >
+          Resend verification email
+        </button>
+      )}
 
       <div className="mt-8 text-center text-sm text-gray-500">
         Don't have an account?{" "}

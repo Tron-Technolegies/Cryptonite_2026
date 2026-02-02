@@ -3,6 +3,8 @@ import { addToCart } from "../../api/cart.api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loading from "../../components/ui/Loading";
+import { getBundles } from "../../api/bundles.api";
+import { FiActivity, FiZap } from "react-icons/fi";
 
 export default function BundleProducts() {
   const [bundles, setBundles] = useState([]);

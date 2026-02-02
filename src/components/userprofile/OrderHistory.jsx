@@ -9,20 +9,15 @@ export default function OrderHistory({ orders }) {
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.items.some((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    const matchesStatus =
-      statusFilter === "All Status" || order.status === statusFilter;
+      order.items.some((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesStatus = statusFilter === "All Status" || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <div className="mb-6">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2 josefin-sans">
-          ORDER HISTORY
-        </h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2 josefin-sans">ORDER HISTORY</h2>
         <p className="text-gray-600 text-sm">
           Track your orders, download invoices, and manage your mining equipment purchases.
         </p>
@@ -87,8 +82,8 @@ export default function OrderHistory({ orders }) {
                     order.status === "Completed"
                       ? "bg-green-100 text-green-700"
                       : order.status === "Processing"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-blue-100 text-blue-700"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-blue-100 text-blue-700"
                   }`}
                 >
                   {order.status}
@@ -114,18 +109,12 @@ export default function OrderHistory({ orders }) {
               {order.items.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-3">
                   <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900 text-sm">{item.name}</p>
                     <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
-                    <p className="text-sm font-semibold text-[#00c336]">
-                      ${item.price}
-                    </p>
+                    <p className="text-sm font-semibold text-[#00c336]">${item.price}</p>
                   </div>
                 </div>
               ))}
@@ -133,9 +122,17 @@ export default function OrderHistory({ orders }) {
 
             {/* Invoice Button */}
             <div className="flex justify-end pt-3 border-t border-gray-200">
-              <button className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-[#00c336] hover:bg-gray-50 rounded-lg transition-colors">
+              <button
+                onClick={() =>
+                  window.open(
+                    `${import.meta.env.VITE_API_BASE_URL}/invoices/${order.id}/download/`,
+                    "_blank",
+                  )
+                }
+                className="flex items-center gap-2 px-4 py-2 hover:text-[#00c336]"
+              >
                 <FaDownload />
-                <span className="font-medium">Invoice</span>
+                Invoice
               </button>
             </div>
           </div>
