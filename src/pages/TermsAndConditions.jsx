@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const TermsAndConditions = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <section className="bg-white text-gray-800 py-24 px-4">
       <div className="max-w-4xl mx-auto">

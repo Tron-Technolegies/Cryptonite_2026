@@ -58,7 +58,7 @@ const EventsPage = () => {
               >
                 <div className="relative h-56 overflow-hidden">
                   <img
-                    src={getImageUrl(event.image)}
+                    src={getImageUrl(event.thumbnail)}
                     alt={event.title}
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                   />

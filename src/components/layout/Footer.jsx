@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { FiMail, FiPhone, FiMapPin, FiFacebook, FiInstagram, FiYoutube } from "react-icons/fi";
 import { FaXTwitter } from "react-icons/fa6";
 import cryptoniteLogo from "../../../public/logos/cryptonitelogoupdated.png";
@@ -36,6 +36,16 @@ const Footer = () => {
                 </NavLink>
               </li>
               <li>
+                <NavLink to="/shop" className="hover:text-(--primary-color)">
+                  Products
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/bundles" className="hover:text-(--primary-color)">
+                  Bundles
+                </NavLink>
+              </li>
+              <li>
                 <NavLink to="/about" className="hover:text-(--primary-color)">
                   About
                 </NavLink>
@@ -57,11 +67,11 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold text-lg mb-4">SERVICES</h3>
             <ul className="space-y-2 text-sm">
-              <li className="hover:text-(--primary-color)">ASIC Mining</li>
-              <li className="hover:text-(--primary-color)">Hosting Solutions</li>
-              <li className="hover:text-(--primary-color)">Mining</li>
-              <li className="hover:text-(--primary-color)">Consultation</li>
-              <li className="hover:text-(--primary-color)">Maintenance</li>
+              <li className="hover:text-(--primary-color)"> <Link to="/shop">ASIC Mining</Link></li>
+              <li className="hover:text-(--primary-color)"> <Link to="/hosting">Hosting Solutions</Link></li>
+              <li className="hover:text-(--primary-color)"> <Link to="/shop">Mining</Link></li>
+              <li className="hover:text-(--primary-color)"> <Link to="/contact">Consultation</Link></li>
+              <li className="hover:text-(--primary-color)"> <Link to="/contact">Maintenance</Link></li>
             </ul>
           </div>
 
@@ -86,9 +96,9 @@ const Footer = () => {
         <div className="mt-16 border-t border-gray-700 pt-5 flex flex-col md:flex-row justify-between text-sm">
           <p>© 2025 Cryptonite Mining. All rights reserved.</p>
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
-            <span className="hover:text-(--primary-color)">Privacy Policy</span>
-            <span className="hover:text-(--primary-color)">Terms of Service</span>
-            <span className="hover:text-(--primary-color)">Cookie Policy</span>
+            <span className="hover:text-(--primary-color)"> <Link to="/terms">Privacy Policy</Link></span>
+            <span className="hover:text-(--primary-color)"> <Link to="/terms">Terms of Service</Link></span>
+            <span className="hover:text-(--primary-color)"> <Link to="/terms">Cookie Policy</Link></span>
           </div>
         </div>
       </div>

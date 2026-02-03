@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import HeroSection from "../components/home/HeroSection";
 import MiningLocations from "../components/home/MiningLocations";
 import ProfitableMiners from "../components/home/ProfitableMiners";
@@ -11,6 +11,9 @@ import FAQ from "../components/home/FAQ";
 import TimelineSection from "../components/home/TimelineSection";
 
 export default function Homepage() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div>
       <HeroSection />

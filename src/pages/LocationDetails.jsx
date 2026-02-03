@@ -5,7 +5,9 @@ import { use, useEffect } from "react";
 import { sendEnquiryMessage } from "../utils/whatsApp";
 
 const LocationDetails = () => {
-  useEffect(() => window.scrollTo(0, 0), []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const { id } = useParams();
   const location = miningLocations.find((loc) => loc.id === id);
 
@@ -131,9 +133,10 @@ const LocationDetails = () => {
               professionally managed mining facilities.
             </p>
 
-            <button className="px-12 py-4 rounded-full bg-black text-white cursor-pointer font-bold hover:opacity-90 transition"
-            onClick={() => sendEnquiryMessage()}>
-
+            <button
+              className="px-12 py-4 rounded-full bg-black text-white cursor-pointer font-bold hover:opacity-90 transition"
+              onClick={() => sendEnquiryMessage()}
+            >
               CONTACT
             </button>
           </div>

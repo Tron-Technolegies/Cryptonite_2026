@@ -108,7 +108,8 @@ const miningLocations = [
     status: "Operational",
     price: "$0.065",
 
-    image: "https://images.unsplash.com/photo-1624024143424-91e1a7c28b0f", // large data center
+    image:
+      "https://miningcolocation.com/wp-content/uploads/2017/12/IMG_20180419_174309-min-1024x768.jpg", // large data center
 
     pageHeading: "Enterprise-Grade Mining in the USA",
 

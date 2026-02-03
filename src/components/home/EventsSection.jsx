@@ -19,7 +19,7 @@ const EventsSection = () => {
       const data = await getEvents();
       // Ensure we have an array and take exactly 2
       const eventList = Array.isArray(data) ? data : [];
-      setEvents(eventList.slice(0, 2));
+      setEvents(eventList.slice(0, 3));
     } catch (error) {
       console.error("Failed to load events:", error);
       setEvents([]);
@@ -52,7 +52,7 @@ const EventsSection = () => {
             {/* IMAGE */}
             <div className="relative">
               <img
-                src={getImageUrl(event.image || event.thumbnail)}
+                src={getImageUrl(event.thumbnail)}
                 alt={event.title}
                 className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -97,6 +97,15 @@ const EventsSection = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* VIEW ALL BUTTON */}
+      <div className="text-center mt-12">
+        <Link to="/events">
+          <button className="bg-(--primary-color) text-white font-semibold px-8 py-3 rounded-lg hover:brightness-110 transition shadow-lg hover:shadow-xl cursor-pointer">
+            View All Events
+          </button>
+        </Link>
       </div>
     </section>
   );

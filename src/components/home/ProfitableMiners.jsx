@@ -7,7 +7,7 @@ import { getImageUrl } from "../../utils/imageUtils";
 const tabs = [
   { label: "Most Profitable", filter: "profitable" },
   { label: "Bitcoin Miners", filter: "bitcoin" },
-  { label: "ALEO Miners", filter: "aleo" },
+  { label: "Kaspa Miners", filter: "KAS" },
 ];
 
 export default function ProfitableMiners() {
@@ -22,7 +22,9 @@ export default function ProfitableMiners() {
   const loadProducts = async () => {
     try {
       setLoading(true);
-      const data = await getProducts();
+      const response = await getProducts();
+      // Handle both direct array and paginated response
+      const data = response.data?.results || response.data || [];
       setProducts(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to load products:", error);
@@ -48,12 +50,16 @@ export default function ProfitableMiners() {
         break;
 
       case "bitcoin":
-        // Filter for SHA-256 algorithm (Bitcoin miners)
-        filtered = filtered.filter(
-          (p) =>
-            p.algorithm?.toLowerCase().includes("sha") ||
-            p.model_name?.toLowerCase().includes("antminer s") ||
-            p.model_name?.toLowerCase().includes("whatsminer m"),
+        // Filter for Bitcoin miners using backend data
+        filtered = filtered.filter((p) =>
+          p.minable_coins?.toUpperCase().includes("BTC")
+        );
+        break;
+
+      case "KAS":
+        // Filter for Kaspa miners using backend data
+        filtered = filtered.filter((p) =>
+          p.minable_coins?.toUpperCase().includes("KAS")
         );
         break;
 
@@ -179,9 +185,7 @@ export default function ProfitableMiners() {
                     ${Number(item.daily_profit).toFixed(2)}/day
                   </span>
                 ) : (
-                  <span className="inline-block px-4 py-1 text-sm font-semibold text-gray-500 bg-gray-100 rounded-full">
-                    Calculate Profit
-                  </span>
+                  <span className="inline-block px-4 py-1 text-sm font-semibold text-black bg-green-500 rounded-2xl">View More </span>
                 )}
               </Link>
             ))}

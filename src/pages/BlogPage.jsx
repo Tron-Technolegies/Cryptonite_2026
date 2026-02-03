@@ -7,10 +7,10 @@ import Blogs from "./Blogs";
 const BlogPage = () => {
   return (
     <div>
-      <BlogPageHeader />
-      <BlogSearchFunctions />
+      {/* <BlogPageHeader /> */}
+      {/* <BlogSearchFunctions /> */}
       <Blogs />
-      <NewsLetterSubscribe />
+      {/* <NewsLetterSubscribe /> */}
     </div>
   );
 };

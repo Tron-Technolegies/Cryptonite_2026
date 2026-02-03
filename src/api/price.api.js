@@ -5,6 +5,8 @@ const COIN_IMAGES = {
   bitcoin: "https://assets.coingecko.com/coins/images/1/small/bitcoin.png",
   kaspa: "https://assets.coingecko.com/coins/images/25751/small/kaspa.png",
   litecoin: "https://assets.coingecko.com/coins/images/2/small/litecoin.png",
+  dogecoin: "https://assets.coingecko.com/coins/images/5/small/dogecoin.png",
+  "ethereum-classic": "https://assets.coingecko.com/coins/images/453/small/ethereum_classic_logo.png",
 };
 
 export const getCoinData = async (coinId) => {

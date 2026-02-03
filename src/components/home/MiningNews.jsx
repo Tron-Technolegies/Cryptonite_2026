@@ -95,6 +95,7 @@ const MiningNews = () => {
           </div>
         ))}
       </div>
+
     </section>
   );
 };

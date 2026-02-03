@@ -316,7 +316,7 @@ export default function SingleProduct() {
       </div>
 
       {/* PROFITABILITY GRAPH */}
-      <ProductProfitabilityGraph product={product} btcPrice={coinData?.price} />
+      <ProductProfitabilityGraph product={product} coinPrice={coinData?.price} />
 
       {/* DEPLOYMENT OPTIONS - Selectable */}
       <div className="mb-16">
@@ -467,7 +467,7 @@ export default function SingleProduct() {
                 className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow"
               >
                 <img
-                  src={p.image}
+                  src={getImageUrl(p.image) || p.image}
                   alt={p.model_name}
                   className="w-full h-48 object-contain rounded-lg mb-4"
                 />

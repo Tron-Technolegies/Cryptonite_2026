@@ -1,22 +1,28 @@
 import { useState, useMemo } from "react";
 
-export default function ProductProfitabilityGraph({ product, btcPrice }) {
+export default function ProductProfitabilityGraph({ product, coinPrice }) {
   const [numberOfMiners, setNumberOfMiners] = useState(1);
   const [electricityCost, setElectricityCost] = useState(0.058);
   const [timePeriod, setTimePeriod] = useState("month"); // day, week, month
 
+  // Extract coin symbol
+  const coinSymbol = product.minable_coins?.split(",")[0]?.trim() || "Coin";
+
   // Debug logging for profitability graph
-  console.log("[ProductProfitabilityGraph] BTC Price:", btcPrice);
-  console.log("[ProductProfitabilityGraph] Product Data:", { hashrate: product.hashrate, power: product.power });
+  console.log("[ProductProfitabilityGraph] Coin Price:", coinPrice);
+  console.log("[ProductProfitabilityGraph] Product Data:", {
+    hashrate: product.hashrate,
+    power: product.power,
+  });
 
   // Use proper calculation logic from working calculator
   const metrics = useMemo(() => {
     // Helper to parse values like "120 TH/s" or "3000 W"
     const parseValue = (val) => {
-        if (!val) return 0;
-        if (typeof val === 'number') return val;
-        const num = parseFloat(val.toString().replace(/[^0-9.]/g, ''));
-        return isNaN(num) ? 0 : num;
+      if (!val) return 0;
+      if (typeof val === "number") return val;
+      const num = parseFloat(val.toString().replace(/[^0-9.]/g, ""));
+      return isNaN(num) ? 0 : num;
     };
 
     const powerKW = parseValue(product.power || 2760) / 1000;
@@ -31,15 +37,15 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
     const coinsPerDay = (hashrateInTH / networkHashrate) * blockReward * blocksPerDay;
 
     // Calculate revenue and costs
-    const currentBtcPrice = btcPrice || 95000;
-    const dailyRevenue = coinsPerDay * currentBtcPrice;
+    const currentCoinPrice = coinPrice || 95000;
+    const dailyRevenue = coinsPerDay * currentCoinPrice;
     const dailyElectricityCost = powerKW * 24 * electricityCost;
     const dailyProfit = dailyRevenue - dailyElectricityCost;
 
     console.log("[Profitability Calculation]:", {
       powerKW,
       hashrateInTH,
-      currentBtcPrice,
+      currentCoinPrice,
       coinsPerDay,
       dailyRevenue,
       dailyElectricityCost,
@@ -57,7 +63,7 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
       dailyProfit: dailyProfit,
       coinsPerDay: coinsPerDay * numberOfMiners,
     };
-  }, [product.power, product.hashrate, btcPrice, electricityCost, numberOfMiners]);
+  }, [product.power, product.hashrate, coinPrice, electricityCost, numberOfMiners]);
 
   // Generate graph data based on selected time period
   const graphData = useMemo(() => {
@@ -73,7 +79,7 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
 
     for (let i = 0; i < period.count; i++) {
       // Add realistic variance (Deterministic to satisfy linter purity rules)
-      const seed = (i + 1) * (timePeriod.length);
+      const seed = (i + 1) * timePeriod.length;
       const pseudoRandom = Math.abs(Math.sin(seed));
       const variance = (pseudoRandom - 0.5) * 0.15;
       const profit = profitPerPeriod * (1 + variance);
@@ -124,23 +130,23 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
                 </button>
               </div>
             </div>
+          </div>
 
-            {/* Electricity Costs */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Electricity costs</label>
-              <div className="relative">
-                <input
-                  type="number"
-                  step="0.001"
-                  value={electricityCost}
-                  onChange={(e) => setElectricityCost(parseFloat(e.target.value) || 0)}
-                  className="w-full h-10 px-3 pr-16 border border-gray-300 rounded-lg font-semibold focus:outline-none focus:ring-2"
-                  style={{ focusRingColor: "var(--primary-color)" }}
-                />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
-                  $/kWh
-                </span>
-              </div>
+          {/* Electricity Costs */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-2">Electricity costs</label>
+            <div className="relative">
+              <input
+                type="number"
+                step="0.001"
+                value={electricityCost}
+                onChange={(e) => setElectricityCost(parseFloat(e.target.value) || 0)}
+                className="w-full h-10 px-3 pr-16 border border-gray-300 rounded-lg font-semibold focus:outline-none focus:ring-2"
+                style={{ focusRingColor: "var(--primary-color)" }}
+              />
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
+                $/kWh
+              </span>
             </div>
           </div>
 
@@ -191,9 +197,9 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
           <div className="flex justify-between items-center mb-3">
             <h4 className="text-base font-bold">Profit Graph</h4>
             <div className="text-right">
-              <div className="text-xs text-gray-600">BTC Price</div>
+              <div className="text-xs text-gray-600">{coinSymbol} Price</div>
               <div className="text-sm font-bold" style={{ color: "var(--primary-color)" }}>
-                ${(btcPrice || 95000).toLocaleString()}
+                ${(coinPrice || 95000).toLocaleString()}
               </div>
             </div>
           </div>
@@ -318,7 +324,7 @@ export default function ProductProfitabilityGraph({ product, btcPrice }) {
 
           {/* Disclaimer */}
           <p className="text-xs text-gray-500 text-center mt-2">
-            * Estimates based on current BTC price and network conditions
+            * Estimates based on current {coinSymbol} price and network conditions
           </p>
         </div>
       </div>

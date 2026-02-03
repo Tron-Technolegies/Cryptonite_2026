@@ -195,12 +195,12 @@ const Header = () => {
                 About Us
               </DropdownItem>
               <DropdownItem
-                to="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setOpenDropdown(null);
-                  sendEnquiryMessage();
-                }}
+                to="/contact"
+                // onClick={(e) => {
+                //   e.preventDefault();
+                //   setOpenDropdown(null);
+                //   sendEnquiryMessage();
+                // }}
               >
                 Contact
               </DropdownItem>

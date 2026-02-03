@@ -27,10 +27,10 @@ const buildQuery = (filters, sortBy) => {
     params.append("brand", b);
   });
 
-  //  FRONTEND coin → BACKEND minable_coins
-  filters.coin.forEach((c) => {
-    params.append("minable_coins", c);
-  });
+  //  FRONTEND coin → Client-Side Filter (Server param broken)
+  // filters.coin.forEach((c) => {
+  //   params.append("supported_coin", c);
+  // });
 
   //  FRONTEND inStock → BACKEND is_available
   if (filters.inStock) {
@@ -82,13 +82,35 @@ export default function ProductGrid({
     setPage(1);
   }, [filters, sortBy]);
 
+  /* ---------------- FILTERING (Client-Side for Coins) ---------------- */
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+    let result = products;
+
+    // Client-side Coin Filter
+    if (filters.coin.length > 0) {
+      result = result.filter((p) => {
+        if (!p.minable_coins) return false;
+        const productCoins = p.minable_coins.toUpperCase();
+        return filters.coin.some((filterCoin) => productCoins.includes(filterCoin));
+      });
+    }
+
+    return result;
+  }, [products, filters.coin]);
+
+  // Update parent count when filtered products change
+  useEffect(() => {
+    onCountChange?.(filteredProducts.length);
+  }, [filteredProducts.length, onCountChange]);
+
   /* ---------------- PAGINATION ---------------- */
-  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
   const paginatedProducts = useMemo(() => {
     const start = (page - 1) * ITEMS_PER_PAGE;
-    return products.slice(start, start + ITEMS_PER_PAGE);
-  }, [products, page]);
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, page]);
 
   /* ---------------- ACTIONS ---------------- */
   const handleBuyNow = async (product) => {
